@@ -12,7 +12,8 @@ def home():
     return "البوت المطيع يعمل بنجاح 24/7!"
 
 def run_web_server():
-    port = int(os.environ.get("PORT", 8080))
+    port = int(os.environ.get("PORT", 10000))
+
     app.run(host='0.0.0.0', port=port)
 
 # تشغيل سيرفر الويب في خلفية الكود لفتح المنفذ المطلوب تلقائياً
