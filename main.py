@@ -19,8 +19,8 @@ def run_web_server():
 Thread(target=run_web_server).start()
 
 # 2. إعداد التوكن ومفتاح الـ API للبوت بشكل ثابت وصحيح 100% دون متغيرات زائدة
-BOT_TOKEN = "8125905403:AAFxCGeWLSNn7yBkh41jzp-U38kw1V5ZRY"
-GEMINI_API_KEY = "AIzaSyAQ_Ab8RN6kqN6bd596NTb-AQdaGtB86_kEIVVCdOb2zSpzI5vy13A"
+BOT_TOKEN = "8925905403:AAFXkCGmVLSHm7yBkh41jzP-U38kmiVSZRY"
+GEMINI_API_KEY = "AQ.Ab8RN6KQN6Bd596NTB-AqDAgtB86_KEIVVCdOb2zSpzI5vyl3A"
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
