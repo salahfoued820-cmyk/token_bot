@@ -19,8 +19,8 @@ def handle_ai_request(message):
     
     bot.send_chat_action(message.chat.id, 'typing')
     
-    # استخدام موديل gemini-1.5-flash لسرعته وتوافقه مع تعليمات النظام
-    url = f"https://googleapis.com{GEMINI_API_KEY}"
+    # استخدام موديل gemini-2.5-flash لسرعته وتوافقه مع تعليمات النظام
+    url = f"https://google apis.com{GEMINI_API_KEY}"
     
     headers = {'Content-Type': 'application/json'}
     
