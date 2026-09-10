@@ -7,7 +7,7 @@ BOT_TOKEN = os.environ.get('BOT_TOKEN', '8925905403:AAFXkCGmVLSHm7yBkh41jzP-U38k
 bot = telebot.TeleBot(BOT_TOKEN)
 
 # 2. جلب مفتاح ذكاء جوجل الاصطناعي (Gemini API Key)
-GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', 'AQ.Ab8RN6KQN6Bd596NTB-AqDAgtB86_KEIVVCdOb2zSpzI5vyl3A')
+GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', 'AQ.Ab8RN6IoAN7G-DSZA0u76qZAvZ8cB8-WZ6lLUhOheronIIMc9w')
 
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
