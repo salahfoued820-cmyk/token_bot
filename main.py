@@ -18,7 +18,7 @@ def run_web_server():
 Thread(target=run_web_server).start()
 
 # 2. إعداد التوكن ومفتاح الجيميني الثابتين والجدد الخاصين بك
-BOT_TOKEN = "8925905403:AAFXkCGmVLSHm7yBkh41jzP-U38kmiVSZRY"
+BOT_TOKEN = "8925905403:AAH_7FdQ92e3-TxDW7YtunzRUQnswLQHtMQ"
 GEMINI_API_KEY = "AQ.Ab8RN6li8PYKkGk8VzokXAGrQJVhXPTssvI03MuXyPufE9TmzQ"
 
 bot = telebot.TeleBot(BOT_TOKEN)
