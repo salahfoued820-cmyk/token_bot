@@ -33,7 +33,7 @@ def handle_ai_request(message):
     bot.send_chat_action(message.chat.id, 'typing')
     
     # الصياغة الرياضية الصارمة لمنع تداخل الرابط مع المفتاح بالهاتف
-    base_url = "https://google apis.com"
+    base_url = "https://googleapis.com"
     url = base_url + GEMINI_API_KEY
     
     headers = {'Content-Type': 'application/json'}
