@@ -5,7 +5,7 @@ import contextlib
 import telebot
 
 # 1. ضع التوكن الخاص بك هنا أو اتركه ليجلب تلقائياً من السيرفر
-BOT_TOKEN = os.environ.get('BOT_TOKEN', '8923883905:AAF3eOw0OdXrDSiGeFOQAAPoxP12OWBlrC4')
+BOT_TOKEN = os.environ.get('BOT_TOKEN', '8925905403:AAFXkCGmVLSHm7yBkh41jzP-U38kmiVSZRY')
 bot = telebot.TeleBot(BOT_TOKEN)
 
 # 2. ضع معرف الـ ID الخاص بحسابك أنت فقط (يتكون من أرقام فقط)
