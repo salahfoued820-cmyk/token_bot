@@ -3,10 +3,8 @@ import telebot
 import requests
 from flask import Flask, request
 
-# 1. إعداد التوكن ومفتاح Gemini الجديد الخاص بك بدقة
+# 1. إعداد التوكن وتثبيت البيانات
 BOT_TOKEN = "8810608330:AAG3ZZnLgi7Jyyx4vqrxk7xfqzXGdBO5Mec"
-GEMINI_API_KEY = "AQ.Ab8RN6KPPcj7kUCWxaH9J4ERPkGnbZM4sDxOOnWVQh8KYJLYQg"
-
 bot = telebot.TeleBot(BOT_TOKEN, threaded=False)
 app = Flask(__name__)
 
@@ -26,9 +24,8 @@ def handle_ai_request(message):
     user_prompt = message.text
     bot.send_chat_action(message.chat.id, 'typing')
     
-    # الصياغة البرمجية المغلقة والمعزولة تماماً لمنع تداخل الرابط بالهاتف
-    base_url = "https://googleapis.com"
-    url = base_url + GEMINI_API_KEY
+    # الرابط مدمج به مفتاحك الصافي الذي يبدأ بـ AQ مباشرة وبأحرفه الصحيحة تماماً
+    url = "https://googleapis.com"
     
     headers = {'Content-Type': 'application/json'}
     payload = {
