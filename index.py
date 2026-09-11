@@ -3,7 +3,7 @@ import telebot
 import requests
 from flask import Flask, request
 
-# 1. إعداد التوكن وتثبيت البيانات
+# إعداد التوكن وتثبيت البيانات
 BOT_TOKEN = "8810608330:AAG3ZZnLgi7Jyyx4vqrxk7xfqzXGdBO5Mec"
 bot = telebot.TeleBot(BOT_TOKEN, threaded=False)
 app = Flask(__name__)
@@ -24,12 +24,13 @@ def handle_ai_request(message):
     user_prompt = message.text
     bot.send_chat_action(message.chat.id, 'typing')
     
-    # التحديث البرمجي الحاسم: المسار الرسمي المباشر والكامل لنموذج جينمي فلاش المتوافق مع مفاتيح AQ
-    url = "https://googleapis.com"
+    # المسار الرسمي المستقر لنموذج Gemini Flash
+    url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
     
+    # التعديل الحاسم: تمرير مفتاح AQ عبر معيار الـ Authorization الصارم الخاص بجوجل
     headers = {
         'Content-Type': 'application/json',
-        'x-goog-api-key': "AQ.Ab8RN6KPPcj7kUCWxaH9J4ERPkGnbZM4sDxOOnWVQh8KYJLYQg"
+        'Authorization': "Bearer AQ.Ab8RN6KPPcj7kUCWxaH9J4ERPkGnbZM4sDxOOnWVQh8KYJLYQg"
     }
     
     payload = {
@@ -47,12 +48,11 @@ def handle_ai_request(message):
         if response.status_code == 200:
             response_data = response.json()
             if 'candidates' in response_data and len(response_data['candidates']) > 0:
-                ai_response = response_data['candidates']['content']['parts'][0]['text']
+                ai_response = response_data['candidates']['content']['parts']['text']
                 bot.reply_to(message, ai_response)
             else:
                 bot.reply_to(message, "⚠️ جوجل لم تولد نصاً، تأكد من إعدادات حساب الذكاء الاصطناعي.")
         else:
-            # في حال وجود أي تنبيه آخر من جوجل ستتم طباعته بدقة هنا لمعرفته
             try:
                 err_desc = response.json().get('error', {}).get('message', response.text)
             except:
