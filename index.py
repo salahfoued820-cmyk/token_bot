@@ -24,10 +24,15 @@ def handle_ai_request(message):
     user_prompt = message.text
     bot.send_chat_action(message.chat.id, 'typing')
     
-    # الرابط مدمج به مفتاحك الصافي الذي يبدأ بـ AQ مباشرة وبأحرفه الصحيحة تماماً
+    # الرابط الصافي لجوجل بدون دمج المفتاح فيه (لأننا سنرسله مشفراً بالأسفل)
     url = "https://googleapis.com"
     
-    headers = {'Content-Type': 'application/json'}
+    # وضع مفتاحك الصافي بدقة داخل رأس الطلب (الـ Headers) كما تشترط جوجل لمفاتيح AQ
+    headers = {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': "AQ.Ab8RN6KPPcj7kUCWxaH9J4ERPkGnbZM4sDxOOnWVQh8KYJLYQg"
+    }
+    
     payload = {
         "contents": [{"parts": [{"text": user_prompt}]}],
         "systemInstruction": {
@@ -45,7 +50,9 @@ def handle_ai_request(message):
             ai_response = response_data['candidates']['content']['parts']['text']
             bot.reply_to(message, ai_response)
         else:
-            bot.reply_to(message, "⚠️ استجابة غير متوقعة من خوادم الذكاء الاصطناعي.")
+            # طباعة الخطأ القادم من جوجل إذا وُجد لمساعدتك
+            error_msg = response_data.get('error', {}).get('message', 'استجابة غير متوقعة من خوادم الذكاء الاصطناعي.')
+            bot.reply_to(message, f"⚠️ تنبيه من جوجل: {error_msg}")
     except Exception as e:
         bot.reply_to(message, f"⚠️ خطأ داخلي: {str(e)}")
 
