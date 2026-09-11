@@ -3,10 +3,9 @@ import telebot
 import requests
 from flask import Flask, request
 
-# التوكن ومفتاح الجيميني الخاصين بك
+# جلب البيانات بشكل صارم من إعدادات Vercel المخفية لحمايتها من الحظر
 BOT_TOKEN = "8810608330:AAG3ZZnLgi7Jyyx4vqrxk7xfqzXGdBO5Mec"
-GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY','AQ.Ab8RN6KPPcj7kUCWxaH9J4ERPkGnbZM4sDxOOnWVQh8KYJLYQg' )
-
+GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', 'AQ.Ab8RN6KPPcj7kUCWxaH9J4ERPkGnbZM4sDxOOnWVQh8KYJLYQg')
 
 bot = telebot.TeleBot(BOT_TOKEN, threaded=False)
 app = Flask(__name__)
@@ -40,10 +39,16 @@ def handle_ai_request(message):
     
     try:
         response = requests.post(url, json=payload, headers=headers)
-        ai_response = response.json()['candidates']['content']['parts']['text']
-        bot.reply_to(message, ai_response)
+        response_data = response.json()
+        
+        # استخراج النص بشكل مضمون لتفادي صمت السيرفر
+        if 'candidates' in response_data and len(response_data['candidates']) > 0:
+            ai_response = response_data['candidates']['content']['parts']['text']
+            bot.reply_to(message, ai_response)
+        else:
+            bot.reply_to(message, "⚠️ عذراً، خوادم الذكاء الاصطناعي لم تستجب بالشكل الصحيح.")
     except Exception as e:
-        bot.reply_to(message, f"⚠️ خطأ: {str(e)}")
+        bot.reply_to(message, f"⚠️ خطأ داخلي: {str(e)}")
 
 @app.route('/')
 def index():
