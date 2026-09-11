@@ -3,7 +3,7 @@ import telebot
 import requests
 from flask import Flask, request
 
-# إعداد التوكن وتثبيت البيانات
+# 1. إعداد التوكن وتثبيت البيانات
 BOT_TOKEN = "8810608330:AAG3ZZnLgi7Jyyx4vqrxk7xfqzXGdBO5Mec"
 bot = telebot.TeleBot(BOT_TOKEN, threaded=False)
 app = Flask(__name__)
@@ -24,9 +24,9 @@ def handle_ai_request(message):
     user_prompt = message.text
     bot.send_chat_action(message.chat.id, 'typing')
     
+    # التحديث البرمجي الحاسم: المسار الرسمي المباشر والكامل لنموذج جينمي فلاش المتوافق مع مفاتيح AQ
     url = "https://googleapis.com"
     
-    # تمرير المفتاح بشكل آمن ومشفر داخل الـ Headers كما تشترط جوجل
     headers = {
         'Content-Type': 'application/json',
         'x-goog-api-key': "AQ.Ab8RN6KPPcj7kUCWxaH9J4ERPkGnbZM4sDxOOnWVQh8KYJLYQg"
@@ -44,19 +44,20 @@ def handle_ai_request(message):
     try:
         response = requests.post(url, json=payload, headers=headers)
         
-        # حماية معصومة لمنع خطأ Expecting value تماماً وتحليل نوع الرد
         if response.status_code == 200:
-            try:
-                response_data = response.json()
-                if 'candidates' in response_data and len(response_data['candidates']) > 0:
-                    ai_response = response_data['candidates']['content']['parts']['text']
-                    bot.reply_to(message, ai_response)
-                else:
-                    bot.reply_to(message, "⚠️ جوجل لم تولد نصاً، تأكد من إعدادات حساب الذكاء الاصطناعي.")
-            except Exception:
-                bot.reply_to(message, "⚠️ خطأ في معالجة بيانات جوجل، الرد المستلم ليس بصيغة JSON.")
+            response_data = response.json()
+            if 'candidates' in response_data and len(response_data['candidates']) > 0:
+                ai_response = response_data['candidates']['content']['parts'][0]['text']
+                bot.reply_to(message, ai_response)
+            else:
+                bot.reply_to(message, "⚠️ جوجل لم تولد نصاً، تأكد من إعدادات حساب الذكاء الاصطناعي.")
         else:
-            bot.reply_to(message, f"⚠️ تنبيه من جوجل (كود الخطأ {response.status_code}): مفتاح الـ API الحالي غير صالح أو منتهي الصلاحية.")
+            # في حال وجود أي تنبيه آخر من جوجل ستتم طباعته بدقة هنا لمعرفته
+            try:
+                err_desc = response.json().get('error', {}).get('message', response.text)
+            except:
+                err_desc = response.text
+            bot.reply_to(message, f"⚠️ تنبيه من جوجل (كود الخطأ {response.status_code}): {err_desc}")
             
     except Exception as e:
         bot.reply_to(message, f"⚠️ خطأ داخلي في السيرفر: {str(e)}")
@@ -64,4 +65,3 @@ def handle_ai_request(message):
 @app.route('/')
 def index():
     return "البوت المطيع مستعد ويعمل بنجاح!"
-
