@@ -5,7 +5,7 @@ from flask import Flask, request
 
 # التوكن ومفتاح الجيميني الخاصين بك
 BOT_TOKEN = "8810608330:AAG3ZZnLgi7Jyyx4vqrxk7xfqzXGdBO5Mec"
-GEMINI_API_KEY = "AQ.Ab8RN6li8PYKkGk8VzokXAGrQJVhXPTssvI03MuXyPufE9TmzQ"
+GEMINI_API_KEY = "AQ.Ab8RN6KPPcj7kUCWxaH9J4ERPkGnbZM4sDxOOnWVQh8KYJLYQg"
 
 bot = telebot.TeleBot(BOT_TOKEN, threaded=False)
 app = Flask(__name__)
