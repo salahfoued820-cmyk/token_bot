@@ -4,7 +4,7 @@ import requests
 from flask import Flask, request
 
 # إعداد التوكن الخاص بالبوت الجديد
-BOT_TOKEN = "8940942126:AAHb24Pv1JbUSvsDddGSTjZj9WmtHYRwDYY"
+BOT_TOKEN = "88292jdjbfiknd0187u3jod83"
 bot = telebot.TeleBot(BOT_TOKEN, threaded=False)
 app = Flask(__name__)
 
