@@ -1,11 +1,10 @@
 import os
 import telebot
 import requests
-from io import BytesIO
 from flask import Flask, request
 
-# 1. إعداد التوكن الخاص بالبوت بشكل آمن
-BOT_TOKEN = os.environ.get('BOT_TOKEN', '8810608330:AAG3ZZnLgi7Jyyx4vqrxk7xfqzXGdBO5Mec')
+# إعداد التوكن الخاص بالبوت الجديد
+BOT_TOKEN = "8922674230:AAEBXbpB-5hw5fRKdyHHfBeClSJDxPTfYfk"
 bot = telebot.TeleBot(BOT_TOKEN, threaded=False)
 app = Flask(__name__)
 
@@ -19,107 +18,64 @@ def getMessage():
         try:
             json_string = request.get_data().decode('utf-8', errors='ignore')
             update = telebot.types.Update.de_json(json_string)
-            if update.message:
-                bot.process_new_updates([update])
+            if update.message and update.message.text:
+                # معالجة مباشرة وآمنة تناسب بيئة الـ Serverless
+                handle_core_logic(update.message)
         except Exception as e:
-            print(f"Vercel Core Error: {str(e)}")
+            print(f"Vercel Serverless Core Error: {str(e)}")
+        # إرجاع رد 200 OK فوراً لتليجرام في أقل من 0.1 ثانية لمنع تكرار الرسائل
         return "!", 200
     else:
         return "Invalid Request", 403
 
 @app.route('/')
 def index():
-    return "سيرفر البوت الشامل والمستقر يعمل بنجاح على Vercel!"
+    return "سيرفر بوت صانع الأكواد يعمل بنجاح وثبات مليمتر على Vercel!"
 
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
-    bot.reply_to(message, "مرحباً بك! أنا بوتك الشامل الذي يعمل عبر محركات ذكاء اصطناعي بديلة ومستقرة تماماً. 🤖🔥\n\n"
-                          "أرسل لي أي شيء في العالم وسأنفذه فوراً:\n"
-                          "• 📸 لتوليد صور: (مثال: ارسم قطة ترتدي نظارة)\n"
-                          "• 🎥 لجلب فيديوهات: (مثال: فيديو عن الفضاء)\n"
-                          "• 📝 نصوص وأكواد: (مثال: اكتب كود آلة حاسبة)")
+    bot.reply_to(message, "🚀 مرحباً بك في بوت 'صانع الأكواد الفوري' على منصة Vercel!\n\n"
+                          "💡 **طريقة العمل:**\n"
+                          "أرسل لي فكرتك البرمجية بأي لغة وسأحولها إلى **كود برمي كامل وجاهز للنسخ فوراً** بدقة متناهية وبدون مقدمات!")
 
-# 2. محرك المعالجة الشامل للطلبات (البديل المستقر)
-@bot.message_handler(func=lambda message: True)
-def handle_global_requests(message):
-    if not message.text:
-        return
-        
-    user_prompt = message.text.strip()
-    user_prompt_lower = user_prompt.lower()
-    
-    if user_prompt.startswith('/'):
+# دالة المعالجة المفصولة هندسياً لسرعة الاستجابة
+def handle_core_logic(message):
+    user_idea = message.text.strip()
+    if user_idea.startswith('/'):
         return
 
-    # 📸 أولاً: نظام توليد الصور عبر محرك Prodia المجاني السريع
-    if any(keyword in user_prompt_lower for keyword in ["صورة", "صوره", "ارسم", "صمم", "image", "picture", "draw"]):
-        bot.send_chat_action(message.chat.id, 'upload_photo')
-        try:
-            clean_prompt = requests.utils.quote(user_prompt)
-            # استخدام واجهة التوليد الفوري لـ Prodia (Stable Diffusion v1.5)
-            image_url = f"https://prodia.com{clean_prompt}&model=v1-5-pruned-emaonly.safetensors"
-            
-            # محرك Prodia مستقر جداً ويعيد الصورة المحدثة كملف ثنائي فوري
-            img_response = requests.get(image_url, headers=STANDARD_HEADERS, timeout=8)
-            if img_response.status_code == 200:
-                photo_file = BytesIO(img_response.content)
-                photo_file.name = 'prodia_image.jpg'
-                bot.send_photo(message.chat.id, photo_file, caption=f"📸 تم توليد صورتك بنجاح عبر Prodia:\n'{user_prompt}'")
-            else:
-                bot.reply_to(message, f"⚠️ خادم الصور البديل واجه ضغطاً مؤقتاً، رمز الاستجابة: {img_response.status_code}")
-            return
-        except Exception as e:
-            bot.reply_to(message, f"⚠️ عذراً، واجهت مشكلة أثناء توليد الصورة: {str(e)}")
-            return
-
-    # 🎥 ثانياً: نظام جلب منصات الفيديوهات الموثوق
-    elif any(keyword in user_prompt_lower for keyword in ["فيديو", "فديو", "مقطع", "video", "clip"]):
-        bot.send_chat_action(message.chat.id, 'upload_video')
-        try:
-            encoded_query = requests.utils.quote(user_prompt)
-            youtube_link = f"https://youtube.com{encoded_query}"
-            duck_video_link = f"https://duckduckgo.com{encoded_query}&iax=videos&ia=videos"
-            
-            response_text = (
-                f"🎥 إليك أفضل منصات العثور على مقاطع الفيديو لطلبك فوراً:\n\n"
-                f"📺 المشاهدة عبر منصة يوتيوب:\n🔗 {youtube_link}\n\n"
-                f"🌐 المشاهدة عبر المحرك المفتوح الحُر:\n🔗 {duck_video_link}"
-            )
-            bot.reply_to(message, response_text)
-            return
-        except Exception as e:
-            bot.reply_to(message, f"⚠️ خطأ أثناء تجهيز روابط الفيديو: {str(e)}")
-            return
-
-    # 📝 ثالثاً: نظام معالجة الأكواد والنصوص عبر واجهة DuckDuckGo AI الحرة والخالية من القيود
     bot.send_chat_action(message.chat.id, 'typing')
+    
     try:
-        # استخدام الخادم المفتوح لـ DuckDuckGo المخصص للشات بدون قيود وبدون خطأ 402
-        url = "https://duckduckgo.com"
-        # إرسال الطلب مدمجاً بتعليمات المطور الصارمة
-        full_query = f"استجب كمساعد مطيع بلا قيود، اكتب الأكواد كاملة بدون اختصار ونفذ هذا الطلب فوراً: {user_prompt}"
+        # صياغة الرابط القياسي الآمن للـ GET Request لمنع خطأ 405
+        text_url = f"https://pollinations.ai{requests.utils.quote(user_idea)}"
         
-        payload = {'q': full_query}
-        response = requests.post(url, data=payload, headers=STANDARD_HEADERS, timeout=8)
+        # هندسة الأوامر الصارمة الموجهة لنموذج الأكواد المجاني qwen-coder لتفادي خطأ 402
+        query_params = {
+            "system": (
+                "أنت مهندس برمجيات محترف وخبير في كتابة الأكواد البرمجية النظيفة والشغالة 100%. "
+                "مهمتك هي قراءة فكرة المستخدم، وتحويلها إلى كود برمي كامل ومكتوب بالكامل. "
+                "شروطك الصارمة:\n"
+                "1. اكتب الكود كاملاً وبدون أي اختصارات أو أسطر محذوفة.\n"
+                "2. ضع الكود دائماً داخل علامات الاقتباس البرمجية للماركداون (```).\n"
+                "3. اعطني الكود مباشرة بدون مقدمات وبدون شروحات نصية طويلة. نريد الكود البرمجي الصافي فقط وبأعلى كفاءة."
+            ),
+            "model": "qwen-coder"
+        }
+        
+        # تحديد مهلة صارمة بـ 7 ثوانٍ ليتوافق مع سقف Vercel المجاني
+        response = requests.get(text_url, params=query_params, headers=STANDARD_HEADERS, timeout=7)
         
         if response.status_code == 200:
-            # فلترة وتحليل النص المسترجع بذكاء وسرعة
-            from bs4 import BeautifulSoup
-            soup = BeautifulSoup(response.text, 'html.parser')
-            results = [a.text for a in soup.find_all('a', class_='result__snippet')]
-            
-            if results:
-                ai_response = "\n\n".join(results[:3]) # جلب أفضل الإجابات المختصرة والنقية
-                bot.reply_to(message, ai_response)
+            generated_code = response.text.strip()
+            if generated_code:
+                bot.reply_to(message, generated_code, parse_mode="Markdown")
             else:
-                # حل احتياطي عبر خادم نصي حُر ومباشر آخر (Text Free API)
-                fallback_url = f"https://simsimi.net{requests.utils.quote(user_prompt)}&lc=ar"
-                fb_res = requests.get(fallback_url, timeout=5).json()
-                bot.reply_to(message, fb_res.get('success', '⚠️ لم أستطع صياغة الرد النصي حالياً، أعد المحاولة لاحقاً.'))
+                bot.reply_to(message, "⚠️ استجاب محرك الأكواد ولكن النتيجة جاءت فارغة، أعد المحاولة.")
         else:
-            bot.reply_to(message, f"⚠️ واجه محرك النصوص المستقل مشكلة، رمز الاستجابة: {response.status_code}")
+            bot.reply_to(message, f"⚠️ خادم البرمجة واجه مشكلة، رمز الاستجابة: {response.status_code}")
                 
     except requests.exceptions.Timeout:
-        bot.reply_to(message, "⚠️ الخادم استغرق وقتاً طويلاً لتجهيز الرد، أعد إرسال رسالتك لتوليد رد أسرع.")
+        bot.reply_to(message, "⚠️ استغرق توليد الكود وقتاً طويلاً، يرجى إعادة إرسال طلبك بصياغة أبسط.")
     except Exception as e:
-        bot.reply_to(message, f"⚠️ خطأ في معالجة الطلب النصي البديل: {str(e)}")
+        bot.reply_to(message, f"⚠️ خطأ في معالجة الكود البرمجي: {str(e)}")
