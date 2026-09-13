@@ -28,22 +28,19 @@ with col1:
         if user_prompt.strip():
             with st.spinner("Generating your custom high-quality image..."):
                 try:
-                    # 🛠️ تصحيح تاريخي: ترك الرابط الرئيسي نقياً وقصيراً جداً لمنع خطأ الالتصاق والـ NameResolutionError
+                    # 🛠️ تصحيح تاريخي: الرابط ثابت ونقي تمامًا لـ Pollinations لمنع الالتصاق نهائيًا
                     base_url = "https://pollinations.ai"
                     
-                    # تمرير النص وباقي الإعدادات كمعاملات منفصلة برمجياً لضمان سلامة الرابط 100%
+                    # 🛠️ الحل المعجز: تمرير الوصف كمعامل مستقل، بايثون ستتولى بناء الرابط خلف الكواليس دون أخطاء
                     query_params = {
+                        "prompt": user_prompt,
                         "width": "1024",
                         "height": "1024",
                         "nologo": "true",
                         "private": "true"
                     }
                     
-                    # بناء الرابط المشفر النظيف بشكل حركي آمن
-                    target_url = f"{base_url}{requests.utils.quote(user_prompt)}"
-                    
-                    # تنزيل الملف الفعلي لضمان العرض المباشر وبدون أي حظر
-                    response = requests.get(target_url, params=query_params, headers=headers, timeout=25)
+                    response = requests.get(base_url, params=query_params, headers=headers, timeout=25)
                     
                     if response.status_code == 200:
                         st.success("✨ **Image generated successfully:**")
@@ -61,10 +58,11 @@ with col2:
         if user_prompt.strip():
             with st.spinner("Creating your custom video animation loop..."):
                 try:
-                    # 🛠️ تصحيح تاريخي: فصل الرابط عن المتغيرات لمنع التشويه
+                    # 🛠️ تصحيح تاريخي: فصل الرابط تمامًا عن المتغيرات والنصوص
                     base_url = "https://pollinations.ai"
                     
                     query_params = {
+                        "prompt": user_prompt,
                         "width": "512",
                         "height": "512",
                         "nologo": "true",
@@ -72,13 +70,11 @@ with col2:
                         "private": "true"
                     }
                     
-                    target_url = f"{base_url}{requests.utils.quote(user_prompt)}"
-                    
-                    response = requests.get(target_url, params=query_params, headers=headers, timeout=25)
+                    response = requests.get(base_url, params=query_params, headers=headers, timeout=25)
                     
                     if response.status_code == 200:
                         st.success("✨ **Video animation created successfully:**")
-                        st.image(response.content, caption=f"Animation: '{user_prompt}'", use_column_width=True)
+                        st.image(response.content, caption=f"Animation: '{user_prompt}'", use_container_width=True)
                     else:
                         st.error(f"⚠️ Video server responded with status code: {response.status_code}")
                 except Exception as e:
