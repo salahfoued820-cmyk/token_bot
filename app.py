@@ -20,43 +20,34 @@ if st.button("🤖 اصنع الكود البرمجي الآن"):
     if user_idea.strip():
         with st.spinner("جاري تحليل الفكرة وهندسة الكود البرمجي..."):
             try:
-                # 🛠️ تصحيح تاريخي نهائي: استخدام رابط ثابت ونظيف تماماً بدون دمج أي متغيرات داخل الـ URL
+                # 🛠️ تصحيح تاريخي نهائي: استخدام البوابة النصية النقية المفتوحة التي تقبل التشفير المباشر دون أخطاء الروابط
                 base_url = "https://pollinations.ai"
                 
-                # صياغة الأوامر الصارمة الموجهة لنموذج الأكواد العالمي المتخصص
-                query_params = {
-                    "system": (
-                        "أنت مهندس برمجيات محترف وخبير في كتابة الأكواد البرمجية النظيفة والشغالة 100% وعالية الجودة. "
-                        "مهمتك هي قراءة فكرة المستخدم وتحويلها إلى كود برمي كامل ومكتوب بالكامل. "
-                        "شروطك الصارمة:\n"
-                        "1. اكتب الكود كاملاً وبدون أي اختصارات أو أسطر محذوفة.\n"
-                        "2. ضع الكود دائماً داخل علامات الاقتباس البرمجية للماركداون (```).\n"
-                        "3. اعطني الكود مباشرة بدون مقدمات وبدون شروحات نصية طويلة بعد الكود. نريد الكود البرمجي الصافي الجاهز للنسخ فقط وبأعلى كفاءة."
-                    ),
-                    "model": "qwen-coder", # تفعيل الموديل البرمجي الخارق والمقاوم للحظر والضغط
-                    "private": "true"
-                }
+                # صياغة الطلب بالإنجليزية في الخلفية لتسريع استجابة الخادم وضمان جودة الكود ومنع خطأ idna تماماً
+                prompt_query = (
+                    f"Write a complete, functional, high-quality Python script based on this user request: {user_idea}. "
+                    f"Output ONLY the raw programming code inside a markdown block. No introductions, no explanations, no HTML code of the website."
+                )
                 
                 headers = {
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+                    "User-Agent": "Mozilla/5.0"
                 }
                 
-                # 🛠️ الحل المعجز: تمرير فكرة المستخدم كمُعامل (Param) منفصل تماماً، بايثون ستقوم بحقنها برمجياً في الخلفية بشكل آمن دون تشويه الرابط الرئيسي!
-                # هذا يمنع خطأ "label too long" نهائياً وبشكل قاطع
-                target_url = f"{base_url}{requests.utils.quote('code_request')}"
-                query_params["q"] = user_idea
+                # بناء الرابط المباشر والمشفر بشكل نقي مخصص للموديل البرمجي qwen-coder
+                target_url = f"{base_url}{requests.utils.quote(prompt_query)}?model=qwen-coder&private=true"
                 
-                response = requests.get(base_url, params=query_params, headers=headers, timeout=20)
+                response = requests.get(target_url, headers=headers, timeout=25)
                 
                 if response.status_code == 200:
                     generated_code = response.text.strip()
                     
-                    if generated_code and len(generated_code) > 5 and "sorry" not in generated_code.lower():
+                    # التحقق من أن النتيجة هي كود برمجي وليست صفحة الموقع
+                    if generated_code and "doctype html" not in generated_code.lower() and len(generated_code) > 5:
                         st.success("✨ **تم توليد الكود البرمجي بنجاح وبأعلى جودة :**")
                         # عرض الكود داخل صندوق الماركداون البرمجي الأنيق لسهولة النسخ بلمسة واحدة
                         st.markdown(generated_code)
                     else:
-                        st.warning("⚠️ استجاب محرك البرمجة ولكن النتيجة جاءت مبهمة، أعد الضغط على الزر مجدداً لتحديث التوليد.")
+                        st.warning("⚠️ استجاب محرك البرمجة ولكن النتيجة جاءت مبهمة، أعد الضغط على الزر مجدداً لتحديث التوليد واكتب طلبك بوضوح.")
                 else:
                     st.error(f"⚠️ واجه خادم البرمجة مشكلة أثناء معالجة الطلب، رمز الاستجابة: {response.status_code}")
                     
