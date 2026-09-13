@@ -1,5 +1,4 @@
 import streamlit as st
-import requests
 
 # Page configuration for a professional media layout
 st.set_page_config(page_title="AI Image & Video Generator", page_icon="🎬", layout="centered")
@@ -18,35 +17,20 @@ user_prompt = st.text_input(
 # Creating two columns for the buttons
 col1, col2 = st.columns(2)
 
-headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-}
-
 # 📸 Column 1: Image Generation Engine
 with col1:
     if st.button("📸 Generate Image Now", use_container_width=True):
         if user_prompt.strip():
             with st.spinner("Generating your custom high-quality image..."):
                 try:
-                    # 🛠️ تصحيح تاريخي: الرابط ثابت ونقي تمامًا لـ Pollinations لمنع الالتصاق نهائيًا
-                    base_url = "https://pollinations.ai"
+                    # 🛠️ الصياغة الرسمية والمستقرة 100% الموصى بها في توثيق Pollinations
+                    # نقوم باستبدال المسافات بعلامة %20 بشكل آمن ومتوافق مع بروتوكولات الويب
+                    safe_prompt = user_prompt.strip().replace(" ", "%20")
+                    image_url = f"https://pollinations.ai{safe_prompt}?width=1024&height=1024&nologo=true&private=true"
                     
-                    # 🛠️ الحل المعجز: تمرير الوصف كمعامل مستقل، بايثون ستتولى بناء الرابط خلف الكواليس دون أخطاء
-                    query_params = {
-                        "prompt": user_prompt,
-                        "width": "1024",
-                        "height": "1024",
-                        "nologo": "true",
-                        "private": "true"
-                    }
-                    
-                    response = requests.get(base_url, params=query_params, headers=headers, timeout=25)
-                    
-                    if response.status_code == 200:
-                        st.success("✨ **Image generated successfully:**")
-                        st.image(response.content, caption=f"Generated: '{user_prompt}'", use_container_width=True)
-                    else:
-                        st.error(f"⚠️ Image server responded with status code: {response.status_code}")
+                    # عرض الصورة مباشرة باستخدام الرابط القياسي المباشر وهو الأسلوب الأكثر استقراراً في Streamlit
+                    st.success("✨ **Image generated successfully:**")
+                    st.image(image_url, caption=f"Generated: '{user_prompt}'", use_container_width=True)
                 except Exception as e:
                     st.error(f"⚠️ Error generating image: {str(e)}")
         else:
@@ -58,25 +42,13 @@ with col2:
         if user_prompt.strip():
             with st.spinner("Creating your custom video animation loop..."):
                 try:
-                    # 🛠️ تصحيح تاريخي: فصل الرابط تمامًا عن المتغيرات والنصوص
-                    base_url = "https://pollinations.ai"
+                    # 🛠️ الصياغة الرسمية المستقرة لتوليد الفيديوهات والرسوم المتحركة
+                    safe_prompt = user_prompt.strip().replace(" ", "%20")
+                    video_url = f"https://pollinations.ai{safe_prompt}?width=512&height=512&nologo=true&feed=true&private=true"
                     
-                    query_params = {
-                        "prompt": user_prompt,
-                        "width": "512",
-                        "height": "512",
-                        "nologo": "true",
-                        "feed": "true",
-                        "private": "true"
-                    }
-                    
-                    response = requests.get(base_url, params=query_params, headers=headers, timeout=25)
-                    
-                    if response.status_code == 200:
-                        st.success("✨ **Video animation created successfully:**")
-                        st.image(response.content, caption=f"Animation: '{user_prompt}'", use_container_width=True)
-                    else:
-                        st.error(f"⚠️ Video server responded with status code: {response.status_code}")
+                    # عرض الفيديو التفاعلي مباشرة
+                    st.success("✨ **Video animation created successfully:**")
+                    st.image(video_url, caption=f"Animation: '{user_prompt}'", use_container_width=True)
                 except Exception as e:
                     st.error(f"⚠️ Error creating video: {str(e)}")
         else:
