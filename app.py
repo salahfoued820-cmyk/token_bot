@@ -31,9 +31,15 @@ with tab1:
         if user_text.strip():
             with st.spinner("جاري معالجة الترجمة..."):
                 try:
-                    # 🛠️ مصلح مجهرياً: استخدام خادم الترجمة العالمي المقاوم لحظر الـ IP المشترك
-                    api_url = f"https://translated.net{requests.utils.quote(user_text)}&langpair=autodetect|{target_lang_code}"
-                    response = requests.get(api_url, timeout=15).json()
+                    # 🛠️ مصلح مجهرياً: استخدام الرابط القياسي الصحيح بالكامل لمنع خطأ التشويه
+                    base_url = "https://translated.net"
+                    query_params = {
+                        "q": user_text,
+                        "langpair": f"autodetect|{target_lang_code}"
+                    }
+                    
+                    # تمرير المعاملات بشكل منفصل وآمن داخل الـ params لمنع كراش الروابط نهائياً
+                    response = requests.get(base_url, params=query_params, timeout=15).json()
                     
                     if response.get("responseData"):
                         translated_text = response["responseData"]["translatedText"]
@@ -71,9 +77,13 @@ with tab2:
                             st.subheader("🔍 النص المكتشف داخل الصورة حرفياً:")
                             st.code(extracted_text)
                             
-                            # الترجمة الاحترافية للنص المستخرج بالمحرك المستقر والمقاوم للحظر
-                            api_url_img = f"https://translated.net{requests.utils.quote(extracted_text)}&langpair=autodetect|{target_lang_code}"
-                            res_img = requests.get(api_url_img, timeout=15).json()
+                            # الترجمة الاحترافية للنص المستخرج بالمعاملات المصلحة الآمنة
+                            base_url_img = "https://translated.net"
+                            query_params_img = {
+                                "q": extracted_text,
+                                "langpair": f"autodetect|{target_lang_code}"
+                            }
+                            res_img = requests.get(base_url_img, params=query_params_img, timeout=15).json()
                             
                             if res_img.get("responseData"):
                                 translated_img = res_img["responseData"]["translatedText"]
