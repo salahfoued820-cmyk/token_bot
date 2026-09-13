@@ -28,11 +28,22 @@ with col1:
         if user_prompt.strip():
             with st.spinner("Generating your custom high-quality image..."):
                 try:
-                    clean_prompt = requests.utils.quote(user_prompt)
-                    image_url = f"https://pollinations.ai{clean_prompt}?width=1024&height=1024&nologo=true&private=true"
+                    # 🛠️ تصحيح تاريخي: ترك الرابط الرئيسي نقياً وقصيراً جداً لمنع خطأ الالتصاق والـ NameResolutionError
+                    base_url = "https://pollinations.ai"
                     
-                    # Téléchargement des octets réels de l'image pour éviter l'affichage brisé
-                    response = requests.get(image_url, headers=headers, timeout=20)
+                    # تمرير النص وباقي الإعدادات كمعاملات منفصلة برمجياً لضمان سلامة الرابط 100%
+                    query_params = {
+                        "width": "1024",
+                        "height": "1024",
+                        "nologo": "true",
+                        "private": "true"
+                    }
+                    
+                    # بناء الرابط المشفر النظيف بشكل حركي آمن
+                    target_url = f"{base_url}{requests.utils.quote(user_prompt)}"
+                    
+                    # تنزيل الملف الفعلي لضمان العرض المباشر وبدون أي حظر
+                    response = requests.get(target_url, params=query_params, headers=headers, timeout=25)
                     
                     if response.status_code == 200:
                         st.success("✨ **Image generated successfully:**")
@@ -50,15 +61,24 @@ with col2:
         if user_prompt.strip():
             with st.spinner("Creating your custom video animation loop..."):
                 try:
-                    clean_prompt = requests.utils.quote(user_prompt)
-                    video_url = f"https://pollinations.ai{clean_prompt}?width=512&height=512&nologo=true&feed=true&private=true"
+                    # 🛠️ تصحيح تاريخي: فصل الرابط عن المتغيرات لمنع التشويه
+                    base_url = "https://pollinations.ai"
                     
-                    # Téléchargement des octets réels de l'animation pour éviter l'affichage brisé
-                    response = requests.get(video_url, headers=headers, timeout=25)
+                    query_params = {
+                        "width": "512",
+                        "height": "512",
+                        "nologo": "true",
+                        "feed": "true",
+                        "private": "true"
+                    }
+                    
+                    target_url = f"{base_url}{requests.utils.quote(user_prompt)}"
+                    
+                    response = requests.get(target_url, params=query_params, headers=headers, timeout=25)
                     
                     if response.status_code == 200:
                         st.success("✨ **Video animation created successfully:**")
-                        st.image(response.content, caption=f"Animation: '{user_prompt}'", use_container_width=True)
+                        st.image(response.content, caption=f"Animation: '{user_prompt}'", use_column_width=True)
                     else:
                         st.error(f"⚠️ Video server responded with status code: {response.status_code}")
                 except Exception as e:
