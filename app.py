@@ -1,6 +1,5 @@
 import streamlit as st
 import requests
-from bs4 import BeautifulSoup
 
 # إعدادات الصفحة البرمجية لـ Streamlit
 st.set_page_config(page_title="منصة صلاح للترجمة الذكية", page_icon="🌐", layout="centered")
@@ -9,37 +8,36 @@ st.set_page_config(page_title="منصة صلاح للترجمة الذكية", p
 st.title("🌐 منصة صلاح العالمية للترجمة الذكية")
 st.write("ترجمة النصوص والصور فوراً بأحدث التقنيات السحابية المحصنة مجاناً 🚀")
 
-# قائمة اللغات المتاحة مع أسمائها الرسمية لمحرك البحث
+# قائمة اللغات المتاحة مع أكوادها الرسمية والمستقرة
 LANGUAGES = {
-    "العربية": "Arabic",
-    "الإنجليزية (English)": "English",
-    "الفرنسية (Français)": "French",
-    "الألمانية (Deutsch)": "German",
-    "الإيطالية (Italiano)": "Italian",
-    "الإسبانية (Español)": "Spanish"
+    "العربية": "ar",
+    "الإنجليزية (English)": "en",
+    "الفرنسية (Français)": "fr",
+    "الألمانية (Deutsch)": "de",
+    "الإيطالية (Italiano)": "it",
+    "الإسبانية (Español)": "es"
 }
 
 # قائمة منسدلة تفاعلية لاختيار اللغة
 target_lang_name = st.selectbox("🎯 اختر اللغة التي تريد الترجمة إليها:", list(LANGUAGES.keys()))
-target_lang_text = LANGUAGES[target_lang_name]
+target_lang_code = LANGUAGES[target_lang_name]
 
 # إنشاء تبويبات لفصل نظام النصوص عن الصور
 tab1, tab2 = st.tabs(["📝 ترجمة النصوص", "📸 ترجمة الصور"])
 
-def fetch_translation(text_to_translate, target_language):
-    """دالة محصنة ومستقرة للترجمة الفورية عبر خادم DuckDuckGo"""
+def translate_core(text_to_translate, lang_code):
+    """المحرك السحابي الفوري والمحمي تماماً من حظر الـ IP"""
     try:
-        url = "https://duckduckgo.com"
-        full_prompt = f"Translate the following text into {target_language}. Give me only the translated text without any introduction or additional words: {text_to_translate}"
-        payload = {'q': full_prompt}
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
-        
-        response = requests.post(url, data=payload, headers=headers, timeout=15)
+        # استخدام بوابة الترجمة الفورية الحرة المفتوحة المتوافقة مع سيرفرات Streamlit
+        url = f"https://pollinations.ai{requests.utils.quote(text_to_translate)}"
+        params = {
+            "system": f"You are a professional translator. Translate the text directly into the language with code '{lang_code}'. Output ONLY the final translated text, no introductions, no chat, no quote marks.",
+            "private": "true"
+        }
+        headers = {"User-Agent": "Mozilla/5.0"}
+        response = requests.get(url, params=params, headers=headers, timeout=12)
         if response.status_code == 200:
-            soup = BeautifulSoup(response.text, 'html.parser')
-            results = [a.text for a in soup.find_all('a', class_='result__snippet')]
-            if results:
-                return results[0].strip()
+            return response.text.strip().replace('"', '')
         return None
     except Exception:
         return None
@@ -49,12 +47,12 @@ with tab1:
     if st.button("🔄 ترجم النص الآن", key="btn_text"):
         if user_text.strip():
             with st.spinner("جاري معالجة الترجمة..."):
-                translated_text = fetch_translation(user_text, target_lang_text)
+                translated_text = translate_core(user_text, target_lang_code)
                 if translated_text:
                     st.success("✨ **الترجمة الاحترافية المعتمدة:**")
                     st.info(translated_text)
                 else:
-                    st.error("⚠️ خادم الترجمة يواجه ضغطاً مؤقتاً حالياً، يرجى إعادة الضغط على الزر للمحاولة مجدداً.")
+                    st.error("⚠️ خادم الترجمة يواجه ضغطاً مؤقتاً، يرجى إعادة الضغط على الزر للمحاولة مجدداً.")
         else:
             st.warning("⚠️ من فضلك، اكتب نصاً أولاً قبل الضغط على زر الترجمة.")
 
@@ -83,8 +81,8 @@ with tab2:
                             st.subheader("🔍 النص المكتشف داخل الصورة حرفياً:")
                             st.code(extracted_text)
                             
-                            # الترجمة الاحترافية للنص المستخرج بالمحرك الفولاذي
-                            translated_img = fetch_translation(extracted_text, target_lang_text)
+                            # الترجمة الاحترافية للنص المستخرج بالمحرك الفولاذي المحدث
+                            translated_img = translate_core(extracted_text, target_lang_code)
                             if translated_img:
                                 st.success("✨ **الترجمة الاحترافية المعتمدة لمحتوى الصورة:**")
                                 st.info(translated_img)
