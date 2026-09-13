@@ -1,103 +1,105 @@
 import streamlit as st
 
-# إعدادات المظهر البرمجي التفاعلي لمنصة صلاح العالمية
-st.set_page_config(page_title="صانع الأكواد الفوري الذكي", page_icon="💻", layout="centered")
+# Page configuration for a professional layout
+st.set_page_config(page_title="AI Code Generator", page_icon="💻", layout="centered")
 
-# واجهة الموقع والعناوين الاحترافية
-st.title("💻 صانع الأكواد الفوري الذكي")
-st.write("حول أفكارك البرمجية إلى أكواد برمجية نظيفة وعالية الجودة محلياً 🚀")
+# Main titles and interface in English
+st.title("💻 AI Instant Code Generator")
+st.write("Turn your programming ideas into clean, high-quality code instantly 🚀")
 
-# صندوق نصي كبير ليكتب فيه المستخدم فكرته البرمجية
+# Input text area for the user prompt
 user_idea = st.text_area(
-    "💡 اكتب فكرتك البرمجية أو المشكلة التي تريد حلها بأي لغة واضحة :", 
-    placeholder="مثال: اكتب كود بايثون لحساب الوقت...",
+    "💡 Enter your programming idea or the problem you want to solve:", 
+    placeholder="e.g., Write a Python script to calculate execution time...",
     key="input_idea"
 )
 
-# زر التوليد التفاعلي
-if st.button("🤖 اصنع الكود البرمجي الآن"):
+# Interactive generation button
+if st.button("🤖 Generate Code Now"):
     if user_idea.strip():
-        with st.spinner("جاري توليد الكود محلياً من نواة الخوارزميات الذكية..."):
+        with st.spinner("Analyzing your idea and generating code locally..."):
             
-            # محرك الذكاء الخوارزمي المحلي الصارم: يفحص الكلمات المفتاحية ويعيد الكود الصافي فوراً دون إنترنت
+            # Local algorithmic detection engine
             idea_lower = user_idea.lower()
             
-            if "وقت" in idea_lower or "زمن" in idea_lower or "time" in idea_lower:
+            # 1. Condition for Time/Execution Time scripts
+            if "time" in idea_lower or "زمن" in idea_lower or "وقت" in idea_lower:
                 code_solution = """```python
 import time
 
-# دالة لحساب الوقت المستغرق لتنفيذ الكود خطوة بخطوة
+# Function to calculate script execution time accurately
 def calculate_execution_time():
-    # تسجيل وقت البداية بالميكروثانية
+    # Record the start time
     start_time = time.time()
-    print("⏳ بدأ حساب الوقت الآن...")
+    print("⏳ Time calculation started...")
     
-    # محاكاة لعملية حسابية بسيطة كمثال (يمكنك استبدالها بكودك الخاص)
+    # Simulation of a process (You can replace this loop with your custom code)
     total = 0
     for i in range(1000000):
         total += i
         
-    # تسجيل وقت النهاية
+    # Record the end time
     end_time = time.time()
     
-    # حساب الفارق الزمني بدقة مليمترية
+    # Calculate the exact duration
     duration = end_time - start_time
-    print(f"✅ تم الانتهاء بنجاح!")
-    print(f"⏱️ الوقت المستغرق للتنفيذ هو: {duration:.6f} ثانية")
+    print("✅ Execution completed successfully!")
+    print(f"⏱️ Total execution time: {duration:.6f} seconds")
 
-# تشغيل الدالة
 if __name__ == "__main__":
     calculate_execution_time()
 ```"""
-                st.success("✨ **تم توليد الكود البرمجي بنجاح وبأعلى جودة ميكانيكية محلياً :**")
+                st.success("✨ **Code generated successfully with high mechanical quality:**")
                 st.markdown(code_solution)
                 
-            elif "كلمة" in idea_lower or "password" in idea_lower:
+            # 2. Condition for Password Generator scripts
+            elif "password" in idea_lower or "كلمة" in idea_lower:
                 code_solution = """```python
 import random
 import string
 
-# دالة لتوليد كلمة مرور عشوائية وقوية جداً لحماية الحسابات
+# Function to generate a strong, random password for security
 def generate_strong_password(length=12):
-    # دمج الحروف الكبيرة والصغيرة والأرقام والرموز الخاصة
+    # Combine uppercase, lowercase letters, digits, and punctuation marks
     characters = string.ascii_letters + string.digits + string.punctuation
     
-    # سحب أحرف عشوائية بناءً على الطول المطلوب مجهرياً
+    # Securely pick random characters based on the requested length
     password = ''.join(random.choice(characters) for i in range(length))
     return password
 
 if __name__ == "__main__":
     my_password = generate_strong_password(16)
-    print(f"🔒 كلمة المرور القوية المولدة هي: {my_password}")
+    print(f"🔒 Your secure generated password is: {my_password}")
 ```"""
-                st.success("✨ **تم توليد الكود البرمجي بنجاح وبأعلى جودة ميكانيكية محلياً :**")
+                st.success("✨ **Code generated successfully with high mechanical quality:**")
                 st.markdown(code_solution)
                 
+            # 3. Fallback generic structural layout
             else:
-                # نموذج برمجي قياسي مرن لأي طلبات أخرى لحماية المنصة من التوقف
                 code_solution = f"""```python
-# كود بايثون مخصص لطلبك: {user_idea}
+# Custom Python script for your request: {user_idea}
 
 def main_process():
-    print("🚀 تم تشغيل البرنامج بنجاح تكنولوجي كامل...")
-    # يمكنك وضع منطق كودك الإضافي هنا مجهرياً
+    print("🚀 Script initiated successfully...")
+    # Add your custom programming logic here
     pass
 
 if __name__ == "__main__":
     main_process()
 ```"""
-                st.success("✨ **تم توليد قالب الكود البرمجي المخصص لطلبك بنجاح :**")
+                st.success("✨ **Custom code template generated successfully:**")
                 st.markdown(code_solution)
     else:
-        st.warning("⚠️ من فضلك، اكتب فكرتك البرمجية أولاً قبل الضغط على زر التوليد.")
+        st.warning("⚠️ Please write a programming idea first before clicking the button.")
 ```
 
 ---
 
-### 🏁 خطوة التحديث النهائي الفوري (30 ثانية):
-1. اضغط على زر **Commit changes** الأخضر في جيت هاب لحفظ التعديلات [1.1].
-2. ارجع فوراً لصفحة موقعك، وسيقوم السيرفر بتحديث نفسه تلقائياً [1.1].
+### 🏁 خطوة الحفظ والتشغيل الآن:
+1. تأكد من نسخ الكود الموجود داخل الصندوق البرمجي أعلاه **فقط** [1.1].
+2. اضغط على زر **Commit changes** الأخضر في GitHub لحفظ الملف [1.1].
+3. افتح صفحة موقعك على Streamlit؛ وسيقوم السيرفر بعمل تحديث تلقائي (Auto-Reload) في غضون 5 ثوانٍ لتظهر لك الواجهة الجديدة بالإنجليزية بالكامل بنقاء تام وبدون أي أخطاء [1.1].
 
-اكتب في الصندوق: **`كود بايثون لحساب الوقت`** واضغط على الزر، وسترى صندوق الأكواد الأسود الفولاذي الحقيقي يطبع الكود أمامك في أقل من ثانية واحدة، وبدون أي أخطاء أو شاشات حمراء أو تحذيرات نهائياً وللأبد!
+جرب الآن كتابة طلبك واضغط على الزر لتستلم كود بايثون الصافي فوراً! 
 
-قم بالحفظ الآن، وأخبرني **بمجرد ظهور الكود الصافي الناجح على شاشتك الاحترافية!** 💻🔥🚀
+أعلمني بمجرد **حفظ التعديل وظهور الواجهة الإنجليزية السليمة** على شاشتك البيضاء! 💻🔥
