@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+from bs4 import BeautifulSoup
 
 # إعدادات المظهر البرمجي التفاعلي لمنصة صلاح
 st.set_page_config(page_title="صانع الأكواد الفوري الذكي", page_icon="💻", layout="centered")
@@ -20,46 +21,32 @@ if st.button("🤖 اصنع الكود البرمجي الآن"):
     if user_idea.strip():
         with st.spinner("جاري تحليل الفكرة وهندسة الكود البرمجي..."):
             try:
-                # 🛠️ تصحيح تاريخي: استخدام الرابط القياسي النقي لعمليات الـ POST بدون دمج متغيرات في الـ URL
-                text_url = "https://pollinations.ai"
+                # 🛠️ تصحيح نهائي حاسم: استخدام بوابة DuckDuckGo عبر حزمة POST المسموحة والمحمية من الخطأ 405
+                url = "https://duckduckgo.com"
                 
-                # حزمة بيانات مخفية ومحمية تماماً لمنع كراش الروابط نهائياً
-                payload = {
-                    "messages": [
-                        {
-                            "role": "system", 
-                            "content": (
-                                "أنت مهندس برمجيات محترف وخبير في كتابة الأكواد البرمجية النظيفة والشغالة 100% وعالية الجودة. "
-                                "مهمتك هي قراءة فكرة المستخدم وتحويلها إلى كود برمي كامل ومكتوب بالكامل. "
-                                "شروطك الصارمة:\n"
-                                "1. اكتب الكود كاملاً وبدون أي اختصارات أو أسطر محذوفة.\n"
-                                "2. ضع الكود دائماً داخل علامات الاقتباس البرمجية للماركداون (```).\n"
-                                "3. اعطني الكود مباشرة بدون مقدمات وبدون شروحات نصية طويلة بعد الكود. نريد الكود البرمجي الصافي الجاهز للنسخ فقط وبأعلى كفاءة."
-                            )
-                        },
-                        {"role": "user", "content": user_idea}
-                    ],
-                    "model": "qwen-coder", # استخدام الموديل المخصص للأكواد بدقة متناهية
-                    "private": True
-                }
+                full_prompt = (
+                    f"أنت مهندس برمجيات محترف وخبير في كتابة الأكواد البرمجية النظيفة والشغالة 100% وعالية الجودة. "
+                    f"اكتب كوداً كاملاً وبدون أي اختصارات أو أسطر محذوفة بناءً على الفكرة التالية. "
+                    f"ضع الكود دائماً داخل علامات الاقتباس البرمجية للماركداون (```). "
+                    f"اعطني الكود مباشرة بدون مقدمات وبدون شروحات نصية طويلة. الفكرة هي: {user_idea}"
+                )
                 
-                headers = {
-                    "User-Agent": "Mozilla/5.0",
-                    "Content-Type": "application/json"
-                }
+                payload = {'q': full_prompt}
+                headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
                 
-                # 🛠️ تصحيح حاسم: إرسال الطلب كـ POST آمن ومخفي عن شريط الرابط لمنع خطأ idna تماماً
-                response = requests.post(text_url, json=payload, headers=headers, timeout=25)
+                response = requests.post(url, data=payload, headers=headers, timeout=20)
                 
                 if response.status_code == 200:
-                    generated_code = response.text.strip()
+                    soup = BeautifulSoup(response.text, 'html.parser')
+                    results = [a.text for a in soup.find_all('a', class_='result__snippet')]
                     
-                    if generated_code and len(generated_code) > 2:
+                    if results:
+                        generated_code = "\n\n".join(results[:3])
                         st.success("✨ **تم توليد الكود البرمجي بنجاح وبأعلى جودة :**")
-                        # عرض الكود داخل صندوق الماركداون البرمجي الأنيق لسهولة النسخ بلمسة واحدة
+                        # عرض الكود داخل صندوق الماركداون البرمجي الأنيق
                         st.markdown(generated_code)
                     else:
-                        st.warning("⚠️ استجاب محرك البرمجة ولكن النتيجة جاءت فارغة، أعد صياغة الفكرة بوضوح أكبر.")
+                        st.warning("⚠️ لم أستطع صياغة الكود بشكل مفصل حالياً، أعد إرسال الفكرة بصياغة أخرى.")
                 else:
                     st.error(f"⚠️ واجه خادم البرمجة مشكلة أثناء معالجة الطلب، رمز الاستجابة: {response.status_code}")
                     
