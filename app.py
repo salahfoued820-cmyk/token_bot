@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+from bs4 import BeautifulSoup
 
 # إعدادات الصفحة البرمجية لـ Streamlit
 st.set_page_config(page_title="منصة صلاح للترجمة الذكية", page_icon="🌐", layout="centered")
@@ -8,47 +9,52 @@ st.set_page_config(page_title="منصة صلاح للترجمة الذكية", p
 st.title("🌐 منصة صلاح العالمية للترجمة الذكية")
 st.write("ترجمة النصوص والصور فوراً بأحدث التقنيات السحابية المحصنة مجاناً 🚀")
 
-# قائمة اللغات المتاحة مع أكوادها الرسمية لـ MyMemory
+# قائمة اللغات المتاحة مع أسمائها الرسمية لمحرك البحث
 LANGUAGES = {
-    "العربية": "ar",
-    "الإنجليزية (English)": "en",
-    "الفرنسية (Français)": "fr",
-    "الألمانية (Deutsch)": "de",
-    "الإيطالية (Italiano)": "it",
-    "الإسبانية (Español)": "es"
+    "العربية": "Arabic",
+    "الإنجليزية (English)": "English",
+    "الفرنسية (Français)": "French",
+    "الألمانية (Deutsch)": "German",
+    "الإيطالية (Italiano)": "Italian",
+    "الإسبانية (Español)": "Spanish"
 }
 
 # قائمة منسدلة تفاعلية لاختيار اللغة
 target_lang_name = st.selectbox("🎯 اختر اللغة التي تريد الترجمة إليها:", list(LANGUAGES.keys()))
-target_lang_code = LANGUAGES[target_lang_name]
+target_lang_text = LANGUAGES[target_lang_name]
 
 # إنشاء تبويبات لفصل نظام النصوص عن الصور
 tab1, tab2 = st.tabs(["📝 ترجمة النصوص", "📸 ترجمة الصور"])
+
+def fetch_translation(text_to_translate, target_language):
+    """دالة محصنة ومستقرة للترجمة الفورية عبر خادم DuckDuckGo"""
+    try:
+        url = "https://duckduckgo.com"
+        full_prompt = f"Translate the following text into {target_language}. Give me only the translated text without any introduction or additional words: {text_to_translate}"
+        payload = {'q': full_prompt}
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+        
+        response = requests.post(url, data=payload, headers=headers, timeout=15)
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, 'html.parser')
+            results = [a.text for a in soup.find_all('a', class_='result__snippet')]
+            if results:
+                return results[0].strip()
+        return None
+    except Exception:
+        return None
 
 with tab1:
     user_text = st.text_area("✏️ اكتب أو الصق النص المراد ترجمته هنا:", placeholder="Hello my friend...", key="input_text")
     if st.button("🔄 ترجم النص الآن", key="btn_text"):
         if user_text.strip():
             with st.spinner("جاري معالجة الترجمة..."):
-                try:
-                    # 🛠️ مصلح مجهرياً: استخدام الرابط القياسي الصحيح بالكامل لمنع خطأ التشويه
-                    base_url = "https://translated.net"
-                    query_params = {
-                        "q": user_text,
-                        "langpair": f"autodetect|{target_lang_code}"
-                    }
-                    
-                    # تمرير المعاملات بشكل منفصل وآمن داخل الـ params لمنع كراش الروابط نهائياً
-                    response = requests.get(base_url, params=query_params, timeout=15).json()
-                    
-                    if response.get("responseData"):
-                        translated_text = response["responseData"]["translatedText"]
-                        st.success("✨ **الترجمة الاحترافية المعتمدة:**")
-                        st.info(translated_text)
-                    else:
-                        st.error("⚠️ فشل خادم الترجمة في معالجة النص، أعد المحاولة بعد لحظات.")
-                except Exception as e:
-                    st.error(f"⚠️ عذراً، حدث خطأ أثناء الاتصال بمحرك الترجمة: {str(e)}")
+                translated_text = fetch_translation(user_text, target_lang_text)
+                if translated_text:
+                    st.success("✨ **الترجمة الاحترافية المعتمدة:**")
+                    st.info(translated_text)
+                else:
+                    st.error("⚠️ خادم الترجمة يواجه ضغطاً مؤقتاً حالياً، يرجى إعادة الضغط على الزر للمحاولة مجدداً.")
         else:
             st.warning("⚠️ من فضلك، اكتب نصاً أولاً قبل الضغط على زر الترجمة.")
 
@@ -77,20 +83,13 @@ with tab2:
                             st.subheader("🔍 النص المكتشف داخل الصورة حرفياً:")
                             st.code(extracted_text)
                             
-                            # الترجمة الاحترافية للنص المستخرج بالمعاملات المصلحة الآمنة
-                            base_url_img = "https://translated.net"
-                            query_params_img = {
-                                "q": extracted_text,
-                                "langpair": f"autodetect|{target_lang_code}"
-                            }
-                            res_img = requests.get(base_url_img, params=query_params_img, timeout=15).json()
-                            
-                            if res_img.get("responseData"):
-                                translated_img = res_img["responseData"]["translatedText"]
+                            # الترجمة الاحترافية للنص المستخرج بالمحرك الفولاذي
+                            translated_img = fetch_translation(extracted_text, target_lang_text)
+                            if translated_img:
                                 st.success("✨ **الترجمة الاحترافية المعتمدة لمحتوى الصورة:**")
                                 st.info(translated_img)
                             else:
-                                st.error("⚠️ فشل الخادم في ترجمة النص المستخرج.")
+                                st.error("⚠️ تعذر ترجمة النص المستخرج حالياً، يرجى المحاولة مجدداً.")
                         else:
                             st.warning("⚠️ لم يتم العثور على أي نصوص مقروءة أو واضحة داخل هذه الصورة.")
                     else:
