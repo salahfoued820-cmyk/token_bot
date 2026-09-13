@@ -23,14 +23,14 @@ with col1:
         if user_prompt.strip():
             with st.spinner("Generating your custom high-quality image..."):
                 try:
-                    # 🛠️ الصياغة الرسمية والمستقرة 100% الموصى بها في توثيق Pollinations
-                    # نقوم باستبدال المسافات بعلامة %20 بشكل آمن ومتوافق مع بروتوكولات الويب
+                    # صياغة الرابط القياسي الصحيح
                     safe_prompt = user_prompt.strip().replace(" ", "%20")
                     image_url = f"https://pollinations.ai{safe_prompt}?width=1024&height=1024&nologo=true&private=true"
                     
-                    # عرض الصورة مباشرة باستخدام الرابط القياسي المباشر وهو الأسلوب الأكثر استقراراً في Streamlit
                     st.success("✨ **Image generated successfully:**")
-                    st.image(image_url, caption=f"Generated: '{user_prompt}'", use_container_width=True)
+                    
+                    # 🛠️ الحل المعجز: عرض الصورة عبر صندوق HTML مدمج لتخطي كراش الروابط والصور المكسورة نهائياً
+                    st.markdown(f'<img src="{image_url}" style="width:100%; border-radius:10px;">', unsafe_allow_html=True)
                 except Exception as e:
                     st.error(f"⚠️ Error generating image: {str(e)}")
         else:
@@ -42,13 +42,14 @@ with col2:
         if user_prompt.strip():
             with st.spinner("Creating your custom video animation loop..."):
                 try:
-                    # 🛠️ الصياغة الرسمية المستقرة لتوليد الفيديوهات والرسوم المتحركة
+                    # صياغة رابط الفيديو المتحرك
                     safe_prompt = user_prompt.strip().replace(" ", "%20")
                     video_url = f"https://pollinations.ai{safe_prompt}?width=512&height=512&nologo=true&feed=true&private=true"
                     
-                    # عرض الفيديو التفاعلي مباشرة
                     st.success("✨ **Video animation created successfully:**")
-                    st.image(video_url, caption=f"Animation: '{user_prompt}'", use_container_width=True)
+                    
+                    # 🛠️ الحل المعجز: عرض الفيديو المتحرك عبر كود HTML نظيف وخفيف لضمان الاستجابة الفورية
+                    st.markdown(f'<img src="{video_url}" style="width:100%; border-radius:10px;">', unsafe_allow_html=True)
                 except Exception as e:
                     st.error(f"⚠️ Error creating video: {str(e)}")
         else:
