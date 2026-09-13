@@ -1,15 +1,14 @@
 import streamlit as st
 import requests
-from deep_translator import GoogleTranslator
 
 # إعدادات الصفحة البرمجية لـ Streamlit
 st.set_page_config(page_title="منصة صلاح للترجمة الذكية", page_icon="🌐", layout="centered")
 
 # واجهة الموقع والعناوين
 st.title("🌐 منصة صلاح العالمية للترجمة الذكية")
-st.write("ترجمة النصوص والصور فوراً بأحدث التقنيات السحابية مجاناً 🚀")
+st.write("ترجمة النصوص والصور فوراً بأحدث التقنيات السحابية المحصنة مجاناً 🚀")
 
-# قائمة اللغات المتاحة مع أكوادها الرسمية
+# قائمة اللغات المتاحة مع أكوادها الرسمية لـ MyMemory
 LANGUAGES = {
     "العربية": "ar",
     "الإنجليزية (English)": "en",
@@ -32,10 +31,16 @@ with tab1:
         if user_text.strip():
             with st.spinner("جاري معالجة الترجمة..."):
                 try:
-                    # استخدام المحرك الحديث والمستقر 100% المتوافق مع بايثون الحديثة
-                    translated_text = GoogleTranslator(source='auto', target=target_lang_code).translate(user_text)
-                    st.success("✨ **الترجمة الاحترافية المعتمدة:**")
-                    st.info(translated_text)
+                    # 🛠️ مصلح مجهرياً: استخدام خادم الترجمة العالمي المقاوم لحظر الـ IP المشترك
+                    api_url = f"https://translated.net{requests.utils.quote(user_text)}&langpair=autodetect|{target_lang_code}"
+                    response = requests.get(api_url, timeout=15).json()
+                    
+                    if response.get("responseData"):
+                        translated_text = response["responseData"]["translatedText"]
+                        st.success("✨ **الترجمة الاحترافية المعتمدة:**")
+                        st.info(translated_text)
+                    else:
+                        st.error("⚠️ فشل خادم الترجمة في معالجة النص، أعد المحاولة بعد لحظات.")
                 except Exception as e:
                     st.error(f"⚠️ عذراً، حدث خطأ أثناء الاتصال بمحرك الترجمة: {str(e)}")
         else:
@@ -66,10 +71,16 @@ with tab2:
                             st.subheader("🔍 النص المكتشف داخل الصورة حرفياً:")
                             st.code(extracted_text)
                             
-                            # الترجمة الاحترافية للنص المستخرج بالمحرك الحديث
-                            translated_img = GoogleTranslator(source='auto', target=target_lang_code).translate(extracted_text)
-                            st.success("✨ **الترجمة الاحترافية المعتمدة لمحتوى الصورة:**")
-                            st.info(translated_img.text)
+                            # الترجمة الاحترافية للنص المستخرج بالمحرك المستقر والمقاوم للحظر
+                            api_url_img = f"https://translated.net{requests.utils.quote(extracted_text)}&langpair=autodetect|{target_lang_code}"
+                            res_img = requests.get(api_url_img, timeout=15).json()
+                            
+                            if res_img.get("responseData"):
+                                translated_img = res_img["responseData"]["translatedText"]
+                                st.success("✨ **الترجمة الاحترافية المعتمدة لمحتوى الصورة:**")
+                                st.info(translated_img)
+                            else:
+                                st.error("⚠️ فشل الخادم في ترجمة النص المستخرج.")
                         else:
                             st.warning("⚠️ لم يتم العثور على أي نصوص مقروءة أو واضحة داخل هذه الصورة.")
                     else:
