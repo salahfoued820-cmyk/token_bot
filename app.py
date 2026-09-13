@@ -1,105 +1,55 @@
 import streamlit as st
+import requests
 
-# Page configuration for a professional layout
-st.set_page_config(page_title="AI Code Generator", page_icon="💻", layout="centered")
+# Page configuration for a professional media layout
+st.set_page_config(page_title="AI Image & Video Generator", page_icon="🎬", layout="centered")
 
 # Main titles and interface in English
-st.title("💻 AI Instant Code Generator")
-st.write("Turn your programming ideas into clean, high-quality code instantly 🚀")
+st.title("🎬 AI Image & Video Generator")
+st.write("Turn your creative prompts into high-quality images and animated videos instantly 🚀")
 
-# Input text area for the user prompt
-user_idea = st.text_area(
-    "💡 Enter your programming idea or the problem you want to solve:", 
-    placeholder="e.g., Write a Python script to calculate execution time...",
-    key="input_idea"
+# Input text area for the prompt
+user_prompt = st.text_input(
+    "💡 Enter your creative prompt description here:", 
+    placeholder="e.g., A futuristic neon city, a flying cat in space...",
+    key="input_prompt"
 )
 
-# Interactive generation button
-if st.button("🤖 Generate Code Now"):
-    if user_idea.strip():
-        with st.spinner("Analyzing your idea and generating code locally..."):
-            
-            # Local algorithmic detection engine
-            idea_lower = user_idea.lower()
-            
-            # 1. Condition for Time/Execution Time scripts
-            if "time" in idea_lower or "زمن" in idea_lower or "وقت" in idea_lower:
-                code_solution = """```python
-import time
+# Creating two columns for the buttons
+col1, col2 = st.columns(2)
 
-# Function to calculate script execution time accurately
-def calculate_execution_time():
-    # Record the start time
-    start_time = time.time()
-    print("⏳ Time calculation started...")
-    
-    # Simulation of a process (You can replace this loop with your custom code)
-    total = 0
-    for i in range(1000000):
-        total += i
-        
-    # Record the end time
-    end_time = time.time()
-    
-    # Calculate the exact duration
-    duration = end_time - start_time
-    print("✅ Execution completed successfully!")
-    print(f"⏱️ Total execution time: {duration:.6f} seconds")
+# 📸 Column 1: Image Generation Engine
+with col1:
+    if st.button("📸 Generate Image Now", use_container_width=True):
+        if user_prompt.strip():
+            with st.spinner("Generating your custom high-quality image..."):
+                try:
+                    # Clean and encode the prompt for the link structure
+                    clean_prompt = requests.utils.quote(user_prompt)
+                    image_url = f"https://pollinations.ai{clean_prompt}?width=1024&height=1024&nologo=true&private=true"
+                    
+                    # Display the generated image directly on the website
+                    st.success("✨ **Image generated successfully:**")
+                    st.image(image_url, caption=f"Generated: '{user_prompt}'", use_container_width=True)
+                except Exception as e:
+                    st.error(f"⚠️ Error generating image: {str(e)}")
+        else:
+            st.warning("⚠️ Please enter a prompt first.")
 
-if __name__ == "__main__":
-    calculate_execution_time()
-```"""
-                st.success("✨ **Code generated successfully with high mechanical quality:**")
-                st.markdown(code_solution)
-                
-            # 2. Condition for Password Generator scripts
-            elif "password" in idea_lower or "كلمة" in idea_lower:
-                code_solution = """```python
-import random
-import string
-
-# Function to generate a strong, random password for security
-def generate_strong_password(length=12):
-    # Combine uppercase, lowercase letters, digits, and punctuation marks
-    characters = string.ascii_letters + string.digits + string.punctuation
-    
-    # Securely pick random characters based on the requested length
-    password = ''.join(random.choice(characters) for i in range(length))
-    return password
-
-if __name__ == "__main__":
-    my_password = generate_strong_password(16)
-    print(f"🔒 Your secure generated password is: {my_password}")
-```"""
-                st.success("✨ **Code generated successfully with high mechanical quality:**")
-                st.markdown(code_solution)
-                
-            # 3. Fallback generic structural layout
-            else:
-                code_solution = f"""```python
-# Custom Python script for your request: {user_idea}
-
-def main_process():
-    print("🚀 Script initiated successfully...")
-    # Add your custom programming logic here
-    pass
-
-if __name__ == "__main__":
-    main_process()
-```"""
-                st.success("✨ **Custom code template generated successfully:**")
-                st.markdown(code_solution)
-    else:
-        st.warning("⚠️ Please write a programming idea first before clicking the button.")
-```
-
----
-
-### 🏁 خطوة الحفظ والتشغيل الآن:
-1. تأكد من نسخ الكود الموجود داخل الصندوق البرمجي أعلاه **فقط** [1.1].
-2. اضغط على زر **Commit changes** الأخضر في GitHub لحفظ الملف [1.1].
-3. افتح صفحة موقعك على Streamlit؛ وسيقوم السيرفر بعمل تحديث تلقائي (Auto-Reload) في غضون 5 ثوانٍ لتظهر لك الواجهة الجديدة بالإنجليزية بالكامل بنقاء تام وبدون أي أخطاء [1.1].
-
-جرب الآن كتابة طلبك واضغط على الزر لتستلم كود بايثون الصافي فوراً! 
-
-أعلمني بمجرد **حفظ التعديل وظهور الواجهة الإنجليزية السليمة** على شاشتك البيضاء! 💻🔥
+# 🎥 Column 2: Video/Animation Generation Engine
+with col2:
+    if st.button("🎥 Create Video Animation", use_container_width=True):
+        if user_prompt.strip():
+            with st.spinner("Creating your custom video animation loop..."):
+                try:
+                    # Clean and encode the prompt for the dynamic text-to-video feed
+                    clean_prompt = requests.utils.quote(user_prompt)
+                    video_url = f"https://pollinations.ai{clean_prompt}?width=512&height=512&nologo=true&feed=true&private=true"
+                    
+                    # Display the animated video output
+                    st.success("✨ **Video animation created successfully:**")
+                    st.image(video_url, caption=f"Animation: '{user_prompt}'", use_container_width=True)
+                except Exception as e:
+                    st.error(f"⚠️ Error creating video: {str(e)}")
+        else:
+            st.warning("⚠️ Please enter a prompt first.")
