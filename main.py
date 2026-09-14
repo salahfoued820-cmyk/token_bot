@@ -6,7 +6,6 @@ from flask import Flask
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 
-# إعداد سيرفر خفيف لإبقاء المنصة نشطة
 web_app = Flask(__name__)
 
 @web_app.route('/')
@@ -17,7 +16,6 @@ def run_flask():
     port = int(os.environ.get("PORT", 8080))
     web_app.run(host='0.0.0.0', port=port)
 
-# جلب المفاتيح من متغيرات البيئة
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 HUGGINGFACE_API_TOKEN = os.environ.get("HUGGINGFACE_API_TOKEN")
 
@@ -29,7 +27,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "أهلاً بك! 👋\n"
         "أنا بوت صناعة الفيديوهات بالذكاء الاصطناعي.\n\n"
         "أرسل لي وصفاً للفيديو باللغة الإنجليزية وسيتم توليده مجاناً!\n"
-        "مثال: A running horse in a beautiful forest, cinematic"
+        "مثال: A running horse in a forest"
     )
     await update.message.reply_text(welcome_text, parse_mode="Markdown")
 
@@ -71,6 +69,3 @@ if __name__ == "__main__":
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, generate_video))
     print("Bot started successfully!")
     app.run_polling()
-```
-
----
