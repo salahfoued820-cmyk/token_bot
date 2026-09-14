@@ -1,2 +1,4 @@
-streamlit
+text
+python-telegram-bot
 requests
+flask
