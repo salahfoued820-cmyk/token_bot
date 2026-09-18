@@ -3,11 +3,13 @@ import json
 import logging
 import requests
 import telebot
+# [تم الحسم الفوري]: استدعاء المكتبات المفقودة في النواة لمنع الـ NameError نهائياً
+import threading
+import time
 
 # -------------------------------------------------------------
 # 🪐 الإعدادات المعمارية الفائقة (Sovereign Environment Engine)
 # -------------------------------------------------------------
-# تطهير صارم للمتغيرات لمنع أي تداخل شبكي
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
 API_KEY = os.getenv("OPENROUTER_API_KEY", "").strip()
 RENDER_EXTERNAL_URL = os.getenv("RENDER_EXTERNAL_URL", "").strip()
@@ -63,11 +65,9 @@ def _generate_sovereign_reply(user_text: str) -> str:
 # 🏛️ خادم الـ Webhook الصافي (مستقل تماماً عن منافذ النظام الخارجي)
 # -------------------------------------------------------------
 def app(environ, start_response):
-    """مستقبل دفعات الرسائل بنقاء كامل لمنع تضارب الـ Host or Port"""
     request_method = environ.get('REQUEST_METHOD', 'GET')
     path_info = environ.get('PATH_INFO', '')
     
-    # الاستجابة الفورية النظيفة لطلبات الفحص لمنع إشارة القتل SIGTERM
     if request_method == 'GET' or not path_info.endswith(BOT_TOKEN):
         start_response('200 OK', [('Content-Type', 'text/plain')])
         return [b"Cyber Webhook Agent is Active and Clean!"]
@@ -99,18 +99,16 @@ def app(environ, start_response):
         return [b"OK"]
 
 # -------------------------------------------------------------
-# 🏁 التفعيل الآمن المنفصل للـ Webhook (يُستدعى في خيط معزول كلياً)
+# 🏁 تفعيل وحقن الـ Webhook بالتأخير التلقائي لضمان استقرار المنافذ
 # -------------------------------------------------------------
 def secure_webhook_injection():
-    """تأخير استدعاء الشبكة لضمان استقرار منافذ الحاوية أولاً ومنع الـ Host Error"""
-    time.sleep(5) # انتظر 5 ثوانٍ حتى يستقر خادم Gunicorn تماماً في بيئة Render
+    time.sleep(5) 
     if RENDER_EXTERNAL_URL and BOT_TOKEN:
         try:
             clean_url = RENDER_EXTERNAL_URL.strip().rstrip('/')
             webhook_url = f"{clean_url}/{BOT_TOKEN}"
             logger.info(f"[CYBER_AGENT] بدء الحقن الآمن للـ Webhook على المسار: {webhook_url}")
             
-            # عزل كامل لروابط تليجرام في سياق مستقل تماماً لمنع تضارب المنافذ
             tg_endpoint = f"https://telegram.org{BOT_TOKEN}"
             requests.get(f"{tg_endpoint}/deleteWebhook?drop_pending_updates=True", timeout=10)
             res = requests.get(f"{tg_endpoint}/setWebhook?url={webhook_url}", timeout=10)
@@ -118,5 +116,4 @@ def secure_webhook_injection():
         except Exception as e:
             logger.error(f"فشل الحقن المعزول: {e}")
 
-# إطلاق دالة الحقن في خيط منفصل تماماً ومؤجل لحماية استقرار المنافذ
 threading.Thread(target=secure_webhook_injection, daemon=True).start()
