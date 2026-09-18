@@ -2,14 +2,14 @@ import os
 import sys
 
 # -------------------------------------------------------------
-# 🌐 قفل الحقن السيبراني (Sovereign Environment Hot-Fix)
+# 🪐 الاختراق البيئي الذاتي (Sovereign Environment Hot-Fix)
 # -------------------------------------------------------------
-# الفحص المجهري المباشر لمتغير المنفذ قبل تحميل أي مكتبة في الذاكرة
+# قراءة المنفذ وتطهيره فوراً قبل تحميل أي خيط في الذاكرة
 raw_port = os.getenv("PORT", "8080")
 if not raw_port.isdigit():
-    print(f"[CYBER_AGENT] رصد متغير PORT تالف ومشه في بيئة السيرفر: '{raw_port}'")
-    print("[CYBER_AGENT] تفعيل بروتوكول التطهير الذكي وتصفير المتغير ديناميكياً من الذاكرة الحية حتماً...")
-    # اختراق الذاكرة البيئية للحاوية وحذف القيمة المشوهة إجبارياً
+    print(f"[CYBER_AGENT] رصد متغير PORT تالف في بيئة السيرفر: '{raw_port}'")
+    print("[CYBER_AGENT] تفعيل بروتوكول التطهير الذكي وتصحيح القيمة في الذاكرة الحية...")
+    # إجبار الحاوية على مسح النص المشوه وتعيين منفذ رقمي قياسي رغماً عن Render
     os.environ["PORT"] = "8080"
     print("[CYBER_AGENT] تم تطهير المنفذ بنجاح، وتحويل المسار الآمن إلى 8080.")
 
@@ -21,9 +21,6 @@ import urllib.request
 import urllib.error
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
-# -------------------------------------------------------------
-# 🪐 الإعدادات المعمارية الفائقة (Sovereign Environment Engine)
-# -------------------------------------------------------------
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 API_KEY = os.getenv("OPENROUTER_API_KEY")
 
@@ -38,7 +35,7 @@ if not BOT_TOKEN or not API_KEY:
     sys.exit(1)
 
 # -------------------------------------------------------------
-# 🏛️ خادم الحماية الشامل لتخطي بروتوكولات فحص المنافذ في Render
+# 🏛️ خادم الحماية الشامل لتخطي بروتوكولات فحص المنافذ و HEAD في Render
 # -------------------------------------------------------------
 class UniversalHealthHandler(BaseHTTPRequestHandler):
     def log_message(self, format, *args): return
@@ -59,7 +56,7 @@ class UniversalHealthHandler(BaseHTTPRequestHandler):
     def do_POST(self): self._send_response_safe()
 
 def launch_daemon_health_server():
-    # قراءة آمنة ومضمونة 100% بعد التطهير الجذري في الإقلاع
+    # القراءة الآمنة والمضمونة بعد التطهير الجذري في أول سطر بالكود
     port = int(os.getenv("PORT", "8080"))
     try:
         server = HTTPServer(("0.0.0.0", port), UniversalHealthHandler)
@@ -122,7 +119,7 @@ def _generate_sovereign_reply(user_text: str) -> str:
             logger.error(f"🚨 [محاولة {attempt+1}] فشل الاتصال بالنواة السحابية: {e}")
             time.sleep(2)
             
-    return "⚠️ خوادم الحماية السحابية تفرض ضغطاً شديداً مؤقتاً، أعد إرسال رسالتك الآن لتمريرها."
+    return "⚠️ خوادم الحماية السحابية تفرض ضغطاً شديداً مؤقتاً، أرسل رسالتك مجدداً لتمريرها حتماً."
 
 # -------------------------------------------------------------
 # 📬 محرك الضخ والتنفيذ المتوازي الفائق (Advanced Anti-Blocking Polling)
@@ -188,10 +185,10 @@ def cyber_daemon_polling_loop():
                 logger.error(f"⚠️ خطأ شبكي بروتوكولي في حلقة الاستماع: {http_err.code}")
                 time.sleep(4)
         except Exception as e:
-            logger.error(f"⚠️ انقطاع مؤقت في حلقة الاستماع (إعادة الاتصال التلقائي حتماً بعد 4 ثوانٍ): {e}")
+            logger.error(f"⚠️ انقطاع مؤقت في حلقة الاستماع (إعادة الاتصال تلقائياً حتماً): {e}")
             time.sleep(4)
 
 if __name__ == "__main__":
-    logger.info("⚡ تفعيل المحرك السيبراني العابر للقارات المحصن ذاتياً...")
+    logger.info("⚡ تفعيل المحرك السيبراني النقي ذاتي التطهير والإصلاح...")
     threading.Thread(target=launch_daemon_health_server, daemon=True).start()
     cyber_daemon_polling_loop()
