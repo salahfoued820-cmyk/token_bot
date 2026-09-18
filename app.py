@@ -9,7 +9,6 @@ import time
 # -------------------------------------------------------------
 # 🪐 التطهير السيبراني الصارم للمتغيرات (Sovereign Clean Engine)
 # -------------------------------------------------------------
-# استخدام دالة .strip() بالقوة لإزالة أي مسافات أو رموز مخفية مسببة لـ host or port
 BOT_TOKEN = str(os.getenv("TELEGRAM_BOT_TOKEN", "")).strip().replace(" ", "")
 API_KEY = str(os.getenv("OPENROUTER_API_KEY", "")).strip()
 RENDER_EXTERNAL_URL = str(os.getenv("RENDER_EXTERNAL_URL", "")).strip()
@@ -109,8 +108,8 @@ def secure_webhook_injection():
             webhook_url = f"{clean_url}/{BOT_TOKEN}"
             logger.info(f"[CYBER_AGENT] بدء الحقن المعزول على المسار: {webhook_url}")
             
-            # سحق فخ التوصيل النصي: بناء الرابط الخارجي بشكل صلب ومستقل تماماً 
-            full_tg_route = "https://telegram.org" + str(BOT_TOKEN)
+            # بناء الرابط الرسمي لـ api.telegram.org بشكل صلب ومعزول تماماً عن المتغير المشوه
+            full_tg_route = f"https://telegram.org{BOT_TOKEN}"
             
             requests.get(f"{full_tg_route}/deleteWebhook?drop_pending_updates=True", timeout=10)
             res = requests.get(f"{full_tg_route}/setWebhook?url={webhook_url}", timeout=10)
