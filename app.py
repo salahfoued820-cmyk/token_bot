@@ -68,7 +68,7 @@ def _generate_sovereign_reply(user_text: str) -> str:
         if response.status_code == 200:
             res_json = response.json()
             if "choices" in res_json and len(res_json["choices"]) > 0:
-                return res_json["choices"][0]["message"]["content"].strip()
+                return res_json["choices"]["message"]["content"].strip()
             if "error" in res_json:
                 return f"⚠️ خطأ داخلي من السحابة: {res_json['error'].get('message', 'تفاصيل غير معروفة')}"
                 
