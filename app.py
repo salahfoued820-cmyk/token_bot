@@ -7,11 +7,9 @@ import telebot
 # -------------------------------------------------------------
 # 🪐 الإعدادات المعمارية الفائقة (Sovereign Environment Engine)
 # -------------------------------------------------------------
-BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-API_KEY = os.getenv("OPENROUTER_API_KEY")
-
-# تأكد من وضع رابط الـ Web Service الخاص بك على موقع Render (الرابط الأزرق العلوي في حسابك)
-RENDER_EXTERNAL_URL = os.getenv("RENDER_EXTERNAL_URL")
+BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
+API_KEY = os.getenv("OPENROUTER_API_KEY", "").strip()
+RENDER_EXTERNAL_URL = os.getenv("RENDER_EXTERNAL_URL", "").strip()
 
 MODEL_NAME = "cognitivecomputations/dolphin-2.9-llama3-8b"
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
@@ -39,7 +37,7 @@ def _generate_sovereign_reply(user_text: str) -> str:
     headers = {
         "Authorization": f"Bearer {API_KEY}",
         "Content-Type": "application/json",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "User-Agent": "Mozilla/5.0",
         "Origin": "https://openrouter.ai",
         "Referer": "https://openrouter.ai"
     }
@@ -71,12 +69,13 @@ def _generate_sovereign_reply(user_text: str) -> str:
 # -------------------------------------------------------------
 def app(environ, start_response):
     request_method = environ.get('REQUEST_METHOD', 'GET')
+    path_info = environ.get('PATH_INFO', '')
     
-    if request_method == 'GET' or environ.get('PATH_INFO') != f'/{BOT_TOKEN}':
+    if request_method == 'GET' or path_info != f'/{BOT_TOKEN}':
         start_response('200 OK', [('Content-Type', 'text/plain')])
         return [b"Cyber Webhook Agent is permanently Live and Guarded!"]
     
-    if request_method == 'POST' and environ.get('PATH_INFO') == f'/{BOT_TOKEN}':
+    if request_method == 'POST' and path_info == f'/{BOT_TOKEN}':
         try:
             request_body_size = int(environ.get('CONTENT_LENGTH', 0))
             request_body = environ['wsgi.input'].read(request_body_size)
@@ -108,14 +107,16 @@ def app(environ, start_response):
 # -------------------------------------------------------------
 if RENDER_EXTERNAL_URL:
     try:
-        webhook_url = f"{RENDER_EXTERNAL_URL.strip('/')}/{BOT_TOKEN}"
+        clean_render_url = RENDER_EXTERNAL_URL.strip().rstrip('/')
+        webhook_url = f"{clean_render_url}/{BOT_TOKEN}"
         logger.info(f"[CYBER_AGENT] جاري ربط وتطهير المسار وتثبيت الـ Webhook على: {webhook_url}")
         
-        # [تم الإصلاح جذرياً]: فرض رابط النطاق الرسمي والمكتمل الصحيح لـ api.telegram.org لمنع التصادم والتشوه
+        # [سحق الخطأ نهائياً]: توحيد وتثبيت اسم المتغير المعزول والمطهر هندسياً بالمليمتر
         full_tg_route = f"https://telegram.org{BOT_TOKEN}"
         
-        requests.get(f"{base_tg_url}/deleteWebhook?drop_pending_updates=True", timeout=12)
-        res = requests.get(f"{base_tg_url}/setWebhook?url={webhook_url}", timeout=12)
-        logger.info(f"[CYBER_AGENT] رد تليجرام على الحقن القياسي: {res.text}")
+        # تنفيذ عمليات الحقن والتطهير المباشر بدون خطأ التسمية اللعين
+        requests.get(f"{full_tg_route}/deleteWebhook?drop_pending_updates=True", timeout=12)
+        res = requests.get(f"{full_tg_route}/setWebhook?url={webhook_url}", timeout=12)
+        logger.info(f"[CYBER_AGENT] رد تليجرام الصافي والمطهر على الحقن: {res.text}")
     except Exception as e:
         logger.error(f"فشل حقن الـ Webhook التلقائي: {e}")
