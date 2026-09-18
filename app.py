@@ -12,7 +12,7 @@ BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 MODEL_NAME = "cognitivecomputations/dolphin-2.9-llama3-8b"
-API_URL = "https://openrouter.ai"
+API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - [%(levelname)s] - %(message)s")
 logger = logging.getLogger("SovereignCyberAgent")
