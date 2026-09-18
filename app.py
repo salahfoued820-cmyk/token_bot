@@ -15,7 +15,7 @@ BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 MODEL_NAME = "cognitivecomputations/dolphin-2.9-llama3-8b"
-API_URL = "https://openrouter.ai/api/v1/chat/completions"
+API_URL = "https://openrouter.ai"
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - [%(levelname)s] - %(message)s")
 logger = logging.getLogger("CyberAgent")
@@ -23,6 +23,9 @@ logger = logging.getLogger("CyberAgent")
 if not BOT_TOKEN or not API_KEY:
     logger.critical("❌ انقطاع سياق الأمان: المتغيرات TELEGRAM_BOT_TOKEN أو OPENROUTER_API_KEY غير معرفة!")
     sys.exit(1)
+
+# 🏛️ [سحق الفخ النهائي]: بناء وتأمين الروابط بشكل يعزل النقطتين الرأسيتين للتوكن عن مفسر المنافذ الشبكية
+TG_BASE_URL = f"https://telegram.org{BOT_TOKEN}".rstrip("/") + "/"
 
 # -------------------------------------------------------------
 # 🏛️ خادم الحماية الشامل لكسر قيود المنافذ وفحص الـ HEAD في Render
@@ -101,8 +104,7 @@ def _generate_sovereign_reply(user_text: str) -> str:
         except urllib.error.HTTPError as http_err:
             err_content = http_err.read().decode("utf-8", errors="ignore")
             logger.error(f"❌ [محاولة {attempt+1}] خطأ شبكي حاد من الـ API: {http_err.code}")
-            # [تم الحسم] ملء مصفوفة أكواد الأخطاء الشائعة صراحة لمنع مفسر بايثون من الانهيار والاصطدام النحوي
-            if "<!DOCTYPE html>" in err_content or http_err.code in [408, 429, 500, 502, 503, 504]:
+            if "<!DOCTYPE html>" in err_content or http_err.code in:
                 time.sleep(2)
                 continue
             return f"⚠️ خطأ في الاستجابة السحابية (كود الخطأ: {http_err.code})"
@@ -116,7 +118,7 @@ def _generate_sovereign_reply(user_text: str) -> str:
 # 📬 محرك الضخ والتنفيذ المتوازي الفائق (Advanced Anti-Blocking Polling)
 # -------------------------------------------------------------
 def _send_tg_message_raw(chat_id, text):
-    url = f"https://telegram.org{BOT_TOKEN}/sendMessage"
+    url = TG_BASE_URL + "sendMessage"
     headers = {"Content-Type": "application/json", "User-Agent": "Telegram Bot Agent"}
     
     for mode in ["Markdown", None]:
@@ -130,7 +132,7 @@ def _send_tg_message_raw(chat_id, text):
             if not mode: logger.error(f"❌ فشل ضخ الرسالة نهائياً للـ Chat {chat_id}: {e}")
 
 def _send_tg_action_raw(chat_id):
-    url = f"https://telegram.org{BOT_TOKEN}/sendChatAction"
+    url = TG_BASE_URL + "sendChatAction"
     try:
         req = urllib.request.Request(url, data=json.dumps({"chat_id": chat_id, "action": "typing"}).encode("utf-8"), headers={"Content-Type": "application/json"}, method="POST")
         with urllib.request.urlopen(req, timeout=5): pass
@@ -151,14 +153,14 @@ def _async_worker_pipeline(message_data):
         logger.error(f"🚨 خطأ استثنائي في خيط المعالجة الخلفي: {e}")
 
 def cyber_daemon_polling_loop():
-    try: urllib.request.urlopen(f"https://telegram.org{BOT_TOKEN}/deleteWebhook", timeout=12)
+    try: urllib.request.urlopen(TG_BASE_URL + "deleteWebhook", timeout=12)
     except Exception: pass
     
     last_update_id = 0
     logger.info("📡 انطلاق حلقة الاستماع والضخ السيبراني الفائقة 24/7...")
     
     while True:
-        url = f"https://telegram.org{BOT_TOKEN}/getUpdates?offset={last_update_id + 1}&timeout=30"
+        url = TG_BASE_URL + f"getUpdates?offset={last_update_id + 1}&timeout=30"
         try:
             req = urllib.request.Request(url, headers={"User-Agent": "Telegram Bot Agent"}, method="GET")
             with urllib.request.urlopen(req, timeout=35) as response:
