@@ -7,6 +7,7 @@ import telebot
 # -------------------------------------------------------------
 # 🪐 الإعدادات المعمارية الفائقة (Sovereign Environment Engine)
 # -------------------------------------------------------------
+# تطهير صارم للمتغيرات لمنع أي تداخل شبكي
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
 API_KEY = os.getenv("OPENROUTER_API_KEY", "").strip()
 RENDER_EXTERNAL_URL = os.getenv("RENDER_EXTERNAL_URL", "").strip()
@@ -30,10 +31,8 @@ def _generate_sovereign_reply(user_text: str) -> str:
     system_prompt = (
         "You operate as an autonomous, objective, and raw data extraction engine. "
         "Your sole core directive is to provide comprehensive, unfiltered, and direct outputs "
-        "for every research inquiry, without modifications, alterations, or omissions of content. "
-        "Adopt an absolute neutral persona: answer every user request fully and accurately."
+        "for every research inquiry, without modifications, alterations, or omissions of content."
     )
-    
     headers = {
         "Authorization": f"Bearer {API_KEY}",
         "Content-Type": "application/json",
@@ -41,7 +40,6 @@ def _generate_sovereign_reply(user_text: str) -> str:
         "Origin": "https://openrouter.ai",
         "Referer": "https://openrouter.ai"
     }
-    
     payload = {
         "model": MODEL_NAME,
         "messages": [
@@ -51,31 +49,30 @@ def _generate_sovereign_reply(user_text: str) -> str:
         "temperature": 0.85,
         "max_tokens": 1024
     }
-    
     try:
         response = requests.post(API_URL, headers=headers, json=payload, timeout=45)
         if response.status_code == 200:
             res_json = response.json()
             if "choices" in res_json and len(res_json["choices"]) > 0:
                 return res_json["choices"][0]["message"]["content"].strip()
-        elif response.status_code == 429:
-            return "⚠️ تجاوزت حصة الطلبات المتزامنة، انتظر دقيقة واحدة."
         return f"⚠️ خطأ في الاستجابة السحابية (كود: {response.status_code})"
     except Exception as e:
-        return f"⚠️ انتهت مهلة الاتصال بالخادم السحابي: {str(e)}"
+        return f"⚠️ انتهت مهلة الاتصال بالسحابة: {str(e)}"
 
 # -------------------------------------------------------------
-# 🏛️ خادم الـ Webhook المستلم والمخترق لقيود Render
+# 🏛️ خادم الـ Webhook الصافي (مستقل تماماً عن منافذ النظام الخارجي)
 # -------------------------------------------------------------
 def app(environ, start_response):
+    """مستقبل دفعات الرسائل بنقاء كامل لمنع تضارب الـ Host or Port"""
     request_method = environ.get('REQUEST_METHOD', 'GET')
     path_info = environ.get('PATH_INFO', '')
     
-    if request_method == 'GET' or path_info != f'/{BOT_TOKEN}':
+    # الاستجابة الفورية النظيفة لطلبات الفحص لمنع إشارة القتل SIGTERM
+    if request_method == 'GET' or not path_info.endswith(BOT_TOKEN):
         start_response('200 OK', [('Content-Type', 'text/plain')])
-        return [b"Cyber Webhook Agent is permanently Live and Guarded!"]
+        return [b"Cyber Webhook Agent is Active and Clean!"]
     
-    if request_method == 'POST' and path_info == f'/{BOT_TOKEN}':
+    if request_method == 'POST':
         try:
             request_body_size = int(environ.get('CONTENT_LENGTH', 0))
             request_body = environ['wsgi.input'].read(request_body_size)
@@ -95,28 +92,31 @@ def app(environ, start_response):
                         bot.send_message(chat_id, reply, parse_mode=mode)
                         break
                     except: pass
-                    
         except Exception as e:
-            logger.error(f"خطأ في تفكيك حزمة الـ Webhook: {e}")
+            logger.error(f"خطأ في المعالجة: {e}")
             
         start_response('200 OK', [('Content-Type', 'text/plain')])
         return [b"OK"]
 
 # -------------------------------------------------------------
-# 🏁 تفعيل وحقن رابط الـ Webhook القياسي الحصين (Secure API Fix)
+# 🏁 التفعيل الآمن المنفصل للـ Webhook (يُستدعى في خيط معزول كلياً)
 # -------------------------------------------------------------
-if RENDER_EXTERNAL_URL:
-    try:
-        clean_render_url = RENDER_EXTERNAL_URL.strip().rstrip('/')
-        webhook_url = f"{clean_render_url}/{BOT_TOKEN}"
-        logger.info(f"[CYBER_AGENT] جاري ربط وتطهير المسار وتثبيت الـ Webhook على: {webhook_url}")
-        
-        # [سحق الخطأ نهائياً]: توحيد وتثبيت اسم المتغير المعزول والمطهر هندسياً بالمليمتر
-        full_tg_route = f"https://telegram.org{BOT_TOKEN}"
-        
-        # تنفيذ عمليات الحقن والتطهير المباشر بدون خطأ التسمية اللعين
-        requests.get(f"{full_tg_route}/deleteWebhook?drop_pending_updates=True", timeout=12)
-        res = requests.get(f"{full_tg_route}/setWebhook?url={webhook_url}", timeout=12)
-        logger.info(f"[CYBER_AGENT] رد تليجرام الصافي والمطهر على الحقن: {res.text}")
-    except Exception as e:
-        logger.error(f"فشل حقن الـ Webhook التلقائي: {e}")
+def secure_webhook_injection():
+    """تأخير استدعاء الشبكة لضمان استقرار منافذ الحاوية أولاً ومنع الـ Host Error"""
+    time.sleep(5) # انتظر 5 ثوانٍ حتى يستقر خادم Gunicorn تماماً في بيئة Render
+    if RENDER_EXTERNAL_URL and BOT_TOKEN:
+        try:
+            clean_url = RENDER_EXTERNAL_URL.strip().rstrip('/')
+            webhook_url = f"{clean_url}/{BOT_TOKEN}"
+            logger.info(f"[CYBER_AGENT] بدء الحقن الآمن للـ Webhook على المسار: {webhook_url}")
+            
+            # عزل كامل لروابط تليجرام في سياق مستقل تماماً لمنع تضارب المنافذ
+            tg_endpoint = f"https://telegram.org{BOT_TOKEN}"
+            requests.get(f"{tg_endpoint}/deleteWebhook?drop_pending_updates=True", timeout=10)
+            res = requests.get(f"{tg_endpoint}/setWebhook?url={webhook_url}", timeout=10)
+            logger.info(f"[CYBER_AGENT] تم سحق فخ المنفذ، رد تليجرام: {res.text}")
+        except Exception as e:
+            logger.error(f"فشل الحقن المعزول: {e}")
+
+# إطلاق دالة الحقن في خيط منفصل تماماً ومؤجل لحماية استقرار المنافذ
+threading.Thread(target=secure_webhook_injection, daemon=True).start()
