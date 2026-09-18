@@ -3,16 +3,16 @@ import json
 import logging
 import requests
 import telebot
-# [تم الحسم الفوري]: استدعاء المكتبات المفقودة في النواة لمنع الـ NameError نهائياً
 import threading
 import time
 
 # -------------------------------------------------------------
-# 🪐 الإعدادات المعمارية الفائقة (Sovereign Environment Engine)
+# 🪐 التطهير السيبراني الصارم للمتغيرات (Sovereign Clean Engine)
 # -------------------------------------------------------------
-BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
-API_KEY = os.getenv("OPENROUTER_API_KEY", "").strip()
-RENDER_EXTERNAL_URL = os.getenv("RENDER_EXTERNAL_URL", "").strip()
+# استخدام دالة .strip() بالقوة لإزالة أي مسافات أو رموز مخفية مسببة لـ host or port
+BOT_TOKEN = str(os.getenv("TELEGRAM_BOT_TOKEN", "")).strip().replace(" ", "")
+API_KEY = str(os.getenv("OPENROUTER_API_KEY", "")).strip()
+RENDER_EXTERNAL_URL = str(os.getenv("RENDER_EXTERNAL_URL", "")).strip()
 
 MODEL_NAME = "cognitivecomputations/dolphin-2.9-llama3-8b"
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
@@ -62,7 +62,7 @@ def _generate_sovereign_reply(user_text: str) -> str:
         return f"⚠️ انتهت مهلة الاتصال بالسحابة: {str(e)}"
 
 # -------------------------------------------------------------
-# 🏛️ خادم الـ Webhook الصافي (مستقل تماماً عن منافذ النظام الخارجي)
+# 🏛️ خادم الـ Webhook الصافي المستقر
 # -------------------------------------------------------------
 def app(environ, start_response):
     request_method = environ.get('REQUEST_METHOD', 'GET')
@@ -99,7 +99,7 @@ def app(environ, start_response):
         return [b"OK"]
 
 # -------------------------------------------------------------
-# 🏁 تفعيل وحقن الـ Webhook بالتأخير التلقائي لضمان استقرار المنافذ
+# 🏁 تفعيل الـ Webhook بالعزل التلقائي التام عن منافذ النظام
 # -------------------------------------------------------------
 def secure_webhook_injection():
     time.sleep(5) 
@@ -107,12 +107,14 @@ def secure_webhook_injection():
         try:
             clean_url = RENDER_EXTERNAL_URL.strip().rstrip('/')
             webhook_url = f"{clean_url}/{BOT_TOKEN}"
-            logger.info(f"[CYBER_AGENT] بدء الحقن الآمن للـ Webhook على المسار: {webhook_url}")
+            logger.info(f"[CYBER_AGENT] بدء الحقن المعزول على المسار: {webhook_url}")
             
-            tg_endpoint = f"https://telegram.org{BOT_TOKEN}"
-            requests.get(f"{tg_endpoint}/deleteWebhook?drop_pending_updates=True", timeout=10)
-            res = requests.get(f"{tg_endpoint}/setWebhook?url={webhook_url}", timeout=10)
-            logger.info(f"[CYBER_AGENT] تم سحق فخ المنفذ، رد تليجرام: {res.text}")
+            # سحق فخ التوصيل النصي: بناء الرابط الخارجي بشكل صلب ومستقل تماماً 
+            full_tg_route = "https://telegram.org" + str(BOT_TOKEN)
+            
+            requests.get(f"{full_tg_route}/deleteWebhook?drop_pending_updates=True", timeout=10)
+            res = requests.get(f"{full_tg_route}/setWebhook?url={webhook_url}", timeout=10)
+            logger.info(f"[CYBER_AGENT] تم سحق فخ المنفذ، رد تليجرام الصافي: {res.text}")
         except Exception as e:
             logger.error(f"فشل الحقن المعزول: {e}")
 
