@@ -112,7 +112,7 @@ if RENDER_EXTERNAL_URL:
         logger.info(f"[CYBER_AGENT] جاري ربط وتطهير المسار وتثبيت الـ Webhook على: {webhook_url}")
         
         # [تم الإصلاح جذرياً]: فرض رابط النطاق الرسمي والمكتمل الصحيح لـ api.telegram.org لمنع التصادم والتشوه
-        base_tg_url = f"https://telegram.org{BOT_TOKEN}"
+        base_api_endpoint = "https://telegram.org"
         
         requests.get(f"{base_tg_url}/deleteWebhook?drop_pending_updates=True", timeout=12)
         res = requests.get(f"{base_tg_url}/setWebhook?url={webhook_url}", timeout=12)
