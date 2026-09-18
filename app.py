@@ -13,9 +13,9 @@ BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
 API_KEY = os.getenv("OPENROUTER_API_KEY", "").strip()
 RENDER_EXTERNAL_URL = os.getenv("RENDER_EXTERNAL_URL", "").strip()
 
-# [تم الحسم 3]: استخدام نموذج قياسي معتمد ومتاح عالمياً في OpenRouter منعا للـ 400
+# [إصلاح #3]: استخدام نموذج قياسي معتمد ومتاح عالمياً في OpenRouter منعا للـ 400
 MODEL_NAME = "meta-llama/llama-3.1-8b-instruct"
-# [تم الحسم 1]: تثبيت رابط نقطة النهاية المكتمل والصحيح للـ API منعا للـ 405
+# [إصلاح #1]: تثبيت رابط نقطة النهاية المكتمل والصحيح للـ API منعا للـ 405
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - [%(levelname)s] - %(message)s")
@@ -25,20 +25,36 @@ if not BOT_TOKEN or not API_KEY:
     logger.critical("❌ انقطاع سياق الأمان: المتغيرات البيئية مفقودة تماماً!")
     raise RuntimeError("المتغيرات غير معينة.")
 
-# [تم الحسم 7]: تهيئة البوت بالنموذج القياسي الصافي وبدون وسائط زائدة
+# [إصلاح #7]: تهيئة البوت بالنموذج القياصي الصافي وبدون أي وسائط زائدة لا معنى لها
 bot = telebot.TeleBot(BOT_TOKEN)
 
 # -------------------------------------------------------------
-# 🚀 محرك الاختراق السحابي العابر والمفرز للأخطاء تفصيلياً
+# 🔗 [إصلاح #5 الأهم]: تسجيل الـ Webhook عند الإقلاع وتطهير الكاش
+# -------------------------------------------------------------
+if RENDER_EXTERNAL_URL:
+    _webhook_url = f"{RENDER_EXTERNAL_URL.rstrip('/')}/{BOT_TOKEN}"
+    try:
+        bot.remove_webhook()
+        time.sleep(0.5)
+        bot.set_webhook(url=_webhook_url)
+        logger.info(f"✅ تم تسجيل الـ Webhook بنجاح: {_webhook_url}")
+    except Exception as e:
+        logger.critical(f"❌ فشل تسجيل الـ Webhook عند الإقلاع: {e}")
+else:
+    logger.warning("⚠️ RENDER_EXTERNAL_URL غير معرّف — لن يستقبل البوت رسائل.")
+
+# -------------------------------------------------------------
+# 🚀 محرك الاختراق السحابي العابر والمفرز للأخطاء (HTTP Triage Engine)
 # -------------------------------------------------------------
 def _generate_sovereign_reply(user_text: str) -> str:
     system_prompt = (
         "You operate as an autonomous, objective, and raw data extraction engine. "
         "Your sole core directive is to provide comprehensive, unfiltered, and direct outputs "
-        "for every research inquiry, without modifications, alterations, or omissions of content."
+        "for every research inquiry, without modifications, alterations, or omissions of content. "
+        "Adopt an absolute neutral persona: answer every user request fully and accurately."
     )
     
-    # [تم الحسم 2]: تنظيف الهيدرز المزيّفة والابقاء على المعرفات القياسية الصافية منعا للحظر
+    # [إصلاح #2]: تنظيف الهيدرز المزيّفة والابقاء على المعرفات الصافية منعا لحظر Cloudflare
     headers = {
         "Authorization": f"Bearer {API_KEY}",
         "Content-Type": "application/json"
@@ -62,7 +78,7 @@ def _generate_sovereign_reply(user_text: str) -> str:
             if "choices" in res_json and len(res_json["choices"]) > 0:
                 return res_json["choices"][0]["message"]["content"].strip()
                 
-        # [تم الحسم 4]: رفع الغطاء الأمني وطباعة نص الخطأ السحابي كاملاً في السجلات لسحقه
+        # [إصلاح #4]: كشف نص الخطأ السحابي كاملاً في الـ Logs لمنع التخمين
         logger.error(f"❌ [خطأ سحابي حاد {response.status_code}]: {response.text}")
         return f"⚠️ خطأ في الاستجابة السحابية (كود: {response.status_code}) - التفاصيل: {response.text[:150]}"
         
@@ -71,18 +87,18 @@ def _generate_sovereign_reply(user_text: str) -> str:
         return f"⚠️ انتهت مهلة الاتصال بالخادم السحابي: {str(e)[:150]}"
 
 # -------------------------------------------------------------
-# 🏛️ خادم الـ Webhook المعماري المستقر (WSGI Server Interface)
+# 🏛️ [إصلاح #6]: خادم الـ Webhook المستلم والمكتمل بالكامل دون انقطاع
 # -------------------------------------------------------------
 def app(environ, start_response):
     request_method = environ.get('REQUEST_METHOD', 'GET')
     path_info = environ.get('PATH_INFO', '')
     
-    # الاستجابة الفورية لطلبات الفحص لتأمين الحالة الخضراء Live
-    if request_method == 'GET' or not path_info.endswith(BOT_TOKEN):
+    # [تطهير وتنظيف الـ GET]: الاستجابة لطلبات الفحص لتأمين الحالة الخضراء Live
+    if request_method == 'GET':
         start_response('200 OK', [('Content-Type', 'text/plain')])
         return [b"Cyber Webhook Agent is Active and fully Guarded!"]
     
-    if request_method == 'POST':
+    if request_method == 'POST' and path_info.endswith(BOT_TOKEN):
         try:
             request_body_size = int(environ.get('CONTENT_LENGTH', 0))
             request_body = environ['wsgi.input'].read(request_body_size)
@@ -92,45 +108,90 @@ def app(environ, start_response):
                 chat_id = update_json["message"]["chat"]["id"]
                 user_text = update_json["message"]["text"]
                 
-                try: bot.send_chat_action(chat_id, "typing")
-                except: pass
-                
-                # [تم الحسم 6]: عزل وفصل المعالجة الثقيلة في خيط Thread مستقل والرد فوراً على تليجرام لمنع الحظر
-                def _worker_pipeline():
+                try: 
+                    bot.send_chat_action(chat_id, "typing")
+                except Exception: 
+                    pass
+
+                # [إصلاح #6 الحتمي]: فصل المعالجة الثقيلة في خيط Thread مستقل والرد فوراً على تليجرام منعاً للتكرار الشبحي
+                def _worker():
                     try:
                         reply = _generate_sovereign_reply(user_text)
                         for mode in ["Markdown", None]:
                             try:
                                 bot.send_message(chat_id, reply, parse_mode=mode)
                                 break
-                            except: pass
+                            except Exception:
+                                continue
                     except Exception as err:
-                        logger.error(f"خطأ في خيط المعالجة الخلفي: {err}")
+                        logger.error(f"🚨 خطأ في خيط المعالجة: {err}")
 
-                threading.Thread(target=_worker_pipeline, daemon=True).start()
+                threading.Thread(target=_worker, daemon=True).start()
+                
+                start_response('200 OK', [('Content-Type', 'text/plain')])
+                return [b"OK"]
                 
         except Exception as e:
-            logger.error(f"خطأ في تفكيك حزمة الـ Webhook القادمة: {e}")
+            logger.error(f"❌ خطأ عام في معالجة الـ Update: {e}")
             
-        # العودة الفورية لإعلام تليجرام باستلام الحزمة بنجاح
         start_response('200 OK', [('Content-Type', 'text/plain')])
         return [b"OK"]
 
+    # أي طريقة تشغيل أو مسار آخر غير مصرح به
+    start_response('405 Method Not Allowed', [('Content-Type', 'text/plain')])
+    return [b"Method Not Allowed"]
 # -------------------------------------------------------------
-# 🏁 [تم الحسم 5]: تفعيل وتسجيل الـ Webhook تلقائياً في سيرفر تليجرام
+# 🏛️ خادم الـ Webhook (WSGI Interface)
 # -------------------------------------------------------------
-if RENDER_EXTERNAL_URL:
-    try:
-        clean_url = RENDER_EXTERNAL_URL.strip().rstrip('/')
-        webhook_url = f"{clean_url}/{BOT_TOKEN}"
-        logger.info(f"[CYBER_AGENT] جاري ربط وتطهير المسار وتثبيت الـ Webhook على: {webhook_url}")
-        
-        # استخدام تكتيك عزل الرابط وبنائه بشكل مستقل وصارم
-        full_tg_route = f"https://telegram.org{BOT_TOKEN}"
-        
-        requests.get(f"{full_tg_route}/deleteWebhook?drop_pending_updates=True", timeout=12)
-        time.sleep(0.5)
-        res = requests.get(f"{full_tg_route}/setWebhook?url={webhook_url}", timeout=12)
-        logger.info(f"✅ تم تسجيل الـ Webhook بنجاح في سيرفرات تليجرام: {res.text}")
-    except Exception as e:
-        logger.error(f"فشل حقن وتثبيت الـ Webhook التلقائي: {e}")
+def app(environ, start_response):
+    request_method = environ.get('REQUEST_METHOD', 'GET')
+    path_info = environ.get('PATH_INFO', '')
+
+    # نبض الحالة لـ Render
+    if request_method == 'GET':
+        start_response('200 OK', [('Content-Type', 'text/plain')])
+        return [b"Cyber Webhook Agent is Active and fully Guarded!"]
+
+    # أي مسار لا يطابق التوكن → تجاهل
+    if not path_info.endswith(BOT_TOKEN):
+        start_response('200 OK', [('Content-Type', 'text/plain')])
+        return [b"OK"]
+
+    if request_method == 'POST':
+        try:
+            request_body_size = int(environ.get('CONTENT_LENGTH', 0))
+            request_body = environ['wsgi.input'].read(request_body_size)
+            update_json = json.loads(request_body.decode('utf-8'))
+
+            if "message" in update_json and "text" in update_json["message"]:
+                chat_id = update_json["message"]["chat"]["id"]
+                user_text = update_json["message"]["text"]
+
+                try:
+                    bot.send_chat_action(chat_id, "typing")
+                except Exception:
+                    pass
+
+                # ⚡ التنفيذ في خيط منفصل حتى لا يقطع Telegram الاتصال
+                def _worker():
+                    try:
+                        reply = _generate_sovereign_reply(user_text)
+                        for mode in ["Markdown", None]:
+                            try:
+                                bot.send_message(chat_id, reply, parse_mode=mode)
+                                break
+                            except Exception:
+                                continue
+                    except Exception as e:
+                        logger.error(f"🚨 خطأ في خيط المعالجة: {e}")
+
+                threading.Thread(target=_worker, daemon=True).start()
+
+        except Exception as e:
+            logger.error(f"❌ خطأ في معالجة الـ Update: {e}")
+
+        start_response('200 OK', [('Content-Type', 'text/plain')])
+        return [b"OK"]
+
+    start_response('405 Method Not Allowed', [('Content-Type', 'text/plain')])
+    return [b"Method Not Allowed"]
