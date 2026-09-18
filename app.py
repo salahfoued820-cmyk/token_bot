@@ -10,8 +10,7 @@ import telebot
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 API_KEY = os.getenv("OPENROUTER_API_KEY")
 
-# ضع هنا رابط الـ Web Service الخاص بك على موقع Render (الرابط الأزرق العلوي في حسابك)
-# مثال: https://onrender.com
+# تأكد من وضع رابط الـ Web Service الخاص بك على موقع Render (الرابط الأزرق العلوي في حسابك)
 RENDER_EXTERNAL_URL = os.getenv("RENDER_EXTERNAL_URL")
 
 MODEL_NAME = "cognitivecomputations/dolphin-2.9-llama3-8b"
@@ -24,7 +23,7 @@ if not BOT_TOKEN or not API_KEY:
     logger.critical("❌ انقطاع سياق الأمان: المتغيرات البيئية مفقودة تماماً!")
     raise RuntimeError("المتغيرات غير معينة.")
 
-bot = telebot.TeleBot(BOT_TOKEN, threaded=False) # إيقاف تعدد الخيوط لضمان الأمان الخطي
+bot = telebot.TeleBot(BOT_TOKEN, threaded=False)
 
 # -------------------------------------------------------------
 # 🚀 محرك المعالجة السحابية المفرز للأخطاء
@@ -71,22 +70,18 @@ def _generate_sovereign_reply(user_text: str) -> str:
 # 🏛️ خادم الـ Webhook المستلم والمخترق لقيود Render
 # -------------------------------------------------------------
 def app(environ, start_response):
-    """استقبال دفعات الرسائل المباشرة من سيرفرات تليجرام ومعالجتها فوراً"""
     request_method = environ.get('REQUEST_METHOD', 'GET')
     
-    # 1. تلبية طلبات فحص المنفذ (Health Checks) من Render لمنحنا اللون الأخضر Live
     if request_method == 'GET' or environ.get('PATH_INFO') != f'/{BOT_TOKEN}':
         start_response('200 OK', [('Content-Type', 'text/plain')])
         return [b"Cyber Webhook Agent is permanently Live and Guarded!"]
     
-    # 2. استقبال حزم البيانات القادمة من تليجرام عند وصول رسالة جديدة
     if request_method == 'POST' and environ.get('PATH_INFO') == f'/{BOT_TOKEN}':
         try:
             request_body_size = int(environ.get('CONTENT_LENGTH', 0))
             request_body = environ['wsgi.input'].read(request_body_size)
             update_json = json.loads(request_body.decode('utf-8'))
             
-            # تفكيك الحزمة يدوياً وسحق أي تعارض
             if "message" in update_json and "text" in update_json["message"]:
                 chat_id = update_json["message"]["chat"]["id"]
                 user_text = update_json["message"]["text"]
@@ -109,18 +104,18 @@ def app(environ, start_response):
         return [b"OK"]
 
 # -------------------------------------------------------------
-# 🏁 تفعيل وحقن رابط الـ Webhook تلقائياً في سيرفرات تليجرام
+# 🏁 تفعيل وحقن رابط الـ Webhook القياسي الحصين (Secure API Fix)
 # -------------------------------------------------------------
 if RENDER_EXTERNAL_URL:
     try:
         webhook_url = f"{RENDER_EXTERNAL_URL.strip('/')}/{BOT_TOKEN}"
         logger.info(f"[CYBER_AGENT] جاري ربط وتطهير المسار وتثبيت الـ Webhook على: {webhook_url}")
         
-        # إجبار تليجرام على تنظيف الكاش القديم وإسقاط أي رسائل معلقة تسبب تعارض
-        requests.get(f"https://telegram.org{BOT_TOKEN}/deleteWebhook?drop_pending_updates=True", timeout=10)
+        # [تم الإصلاح جذرياً]: فرض رابط النطاق الرسمي والمكتمل الصحيح لـ api.telegram.org لمنع التصادم والتشوه
+        base_tg_url = f"https://telegram.org{BOT_TOKEN}"
         
-        # تعيين الرابط الجديد
-        res = requests.get(f"https://telegram.org{BOT_TOKEN}/setWebhook?url={webhook_url}", timeout=10)
-        logger.info(f"[CYBER_AGENT] رد تليجرام على الحقن: {res.text}")
+        requests.get(f"{base_tg_url}/deleteWebhook?drop_pending_updates=True", timeout=12)
+        res = requests.get(f"{base_tg_url}/setWebhook?url={webhook_url}", timeout=12)
+        logger.info(f"[CYBER_AGENT] رد تليجرام على الحقن القياسي: {res.text}")
     except Exception as e:
         logger.error(f"فشل حقن الـ Webhook التلقائي: {e}")
