@@ -15,8 +15,7 @@ BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 MODEL_NAME = "cognitivecomputations/dolphin-2.9-llama3-8b"
-# [تصحيح] نقطة النهاية الصحيحة لاستقبال طلبات المحادثة من OpenRouter
-API_URL = "https://openrouter.ai"
+API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - [%(levelname)s] - %(message)s")
 logger = logging.getLogger("CyberAgent")
@@ -102,8 +101,8 @@ def _generate_sovereign_reply(user_text: str) -> str:
         except urllib.error.HTTPError as http_err:
             err_content = http_err.read().decode("utf-8", errors="ignore")
             logger.error(f"❌ [محاولة {attempt+1}] خطأ شبكي حاد من الـ API: {http_err.code}")
-            # [تم السحق بنجاح] تمرير قائمة صريحة بأكواد الأخطاء لإغلاق الجملة النحوية ومنع الـ SyntaxError
-            if "<!DOCTYPE html>" in err_content or http_err.code in:
+            # [تم الحسم] ملء مصفوفة أكواد الأخطاء الشائعة صراحة لمنع مفسر بايثون من الانهيار والاصطدام النحوي
+            if "<!DOCTYPE html>" in err_content or http_err.code in [408, 429, 500, 502, 503, 504]:
                 time.sleep(2)
                 continue
             return f"⚠️ خطأ في الاستجابة السحابية (كود الخطأ: {http_err.code})"
@@ -111,13 +110,12 @@ def _generate_sovereign_reply(user_text: str) -> str:
             logger.error(f"🚨 [محاولة {attempt+1}] فشل الاتصال بالنواة السحابية: {e}")
             time.sleep(2)
             
-    return "⚠️ خوادم الحماية السحابية تفرض ضغطاً شديداً مؤقتاً، أرسل رسالتك مجدداً لتمريرها."
+    return "⚠️ خوادم الحماية السحابية تفرض ضغطاً شديداً مؤقتاً، أرسل رسالتك مجدداً لتمريرها حتماً."
 
 # -------------------------------------------------------------
 # 📬 محرك الضخ والتنفيذ المتوازي الفائق (Advanced Anti-Blocking Polling)
 # -------------------------------------------------------------
 def _send_tg_message_raw(chat_id, text):
-    # [تصحيح] استخدام النطاق البرمجي الصحيح للبوتات لشركة تليجرام
     url = f"https://telegram.org{BOT_TOKEN}/sendMessage"
     headers = {"Content-Type": "application/json", "User-Agent": "Telegram Bot Agent"}
     
