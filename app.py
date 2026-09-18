@@ -14,7 +14,8 @@ API_KEY = os.getenv("OPENROUTER_API_KEY", "").strip()
 RENDER_EXTERNAL_URL = os.getenv("RENDER_EXTERNAL_URL", "").strip()
 
 # [إصلاح #3]: استخدام نموذج قياسي معتمد ومتاح عالمياً في OpenRouter منعا للـ 400
-MODEL_NAME = "cognitivecomputations/dolphin-2.9-llama3-8b"
+MODEL_NAME = "cognitivecomputations/dolphin-2.9.2-qwen-72b"
+
 # [إصلاح #1]: تثبيت رابط نقطة النهاية المكتمل والصحيح للـ API منعا للـ 405
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
@@ -67,7 +68,7 @@ def _generate_sovereign_reply(user_text: str) -> str:
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_text[:4096]}
         ],
-        "temperature": 0.9,
+        "temperature": 0.85,
         "max_tokens": 1024
     }
     
