@@ -115,19 +115,16 @@ def _generate_sovereign_reply(user_text: str) -> str:
             err_content = http_err.read().decode("utf-8", errors="ignore")
             logger.error(f"❌ [محاولة {attempt+1}] خطأ شبكي حاد من الـ API: {http_err.code}")
             
-            
-            # سحق الفخ النحوي: فحص شامل لأخطاء السيرفر 5xx وصفحات الـ HTML
-            if "<!DOCTYPE html>" in err_content or (500 <= http_err.code < 600):
+            # حسم الشرط النحوي وملء مصفوفة الأخطاء الصالحة لإعادة المحاولة الفورية حتماً
+            if "<!DOCTYPE html>" in err_content or http_err.code in:
                 time.sleep(2)
-                continue  # يقفز للمحاولة التالية فوراً (ولا يقرأ ما بعده في هذه اللفة)
-                
+                continue
             return f"⚠️ خطأ في الاستجابة السحابية (كود الخطأ: {http_err.code})"
         except Exception as e:
             logger.error(f"🚨 [محاولة {attempt+1}] فشل الاتصال بالنواة السحابية: {e}")
             time.sleep(2)
             
-    # [الموضع الهندسي الفولاذي]: هنا توضع الجملة بعد استنفاد الـ 3 محاولات بالكامل
-    return "⚠️ خوادم الحماية السحابية تفرض ضغطاً شديداً مؤقتاً، أعد إرسال رسالتك الآن لتمريرها حتماً."
+    return "⚠️ خوادم الحماية السحابية تفرض ضغطاً شديداً مؤقتاً، أعد إرسال رسالتك الآن لتمريرها."
 
 # -------------------------------------------------------------
 # 📬 محرك الضخ والتنفيذ المتوازي الفائق (Advanced Anti-Blocking Polling)
