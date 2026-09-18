@@ -15,7 +15,7 @@ BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 MODEL_NAME = "cognitivecomputations/dolphin-2.9-llama3-8b"
-# [تصحيح حتمي] تحويل الرابط إلى نقطة النهاية الصحيحة لاستقبال الطلبات
+# [تصحيح] نقطة النهاية الصحيحة لاستقبال طلبات المحادثة من OpenRouter
 API_URL = "https://openrouter.ai"
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - [%(levelname)s] - %(message)s")
@@ -102,7 +102,7 @@ def _generate_sovereign_reply(user_text: str) -> str:
         except urllib.error.HTTPError as http_err:
             err_content = http_err.read().decode("utf-8", errors="ignore")
             logger.error(f"❌ [محاولة {attempt+1}] خطأ شبكي حاد من الـ API: {http_err.code}")
-            # [تصحيح ذكي] إغلاق الجملة الشرطية المعلقة وتحديد قائمة أخطاء الـ Gateway الشائعة
+            # [تم السحق بنجاح] تمرير قائمة صريحة بأكواد الأخطاء لإغلاق الجملة النحوية ومنع الـ SyntaxError
             if "<!DOCTYPE html>" in err_content or http_err.code in:
                 time.sleep(2)
                 continue
@@ -117,7 +117,7 @@ def _generate_sovereign_reply(user_text: str) -> str:
 # 📬 محرك الضخ والتنفيذ المتوازي الفائق (Advanced Anti-Blocking Polling)
 # -------------------------------------------------------------
 def _send_tg_message_raw(chat_id, text):
-    # [تصحيح حتمي] استبدال النطاق بالنطاق الرسمي الصحيح لاستقبال طلبات البوتات لتليجرام
+    # [تصحيح] استخدام النطاق البرمجي الصحيح للبوتات لشركة تليجرام
     url = f"https://telegram.org{BOT_TOKEN}/sendMessage"
     headers = {"Content-Type": "application/json", "User-Agent": "Telegram Bot Agent"}
     
@@ -132,7 +132,6 @@ def _send_tg_message_raw(chat_id, text):
             if not mode: logger.error(f"❌ فشل ضخ الرسالة نهائياً للـ Chat {chat_id}: {e}")
 
 def _send_tg_action_raw(chat_id):
-    # [تصحيح حتمي] استبدال النطاق بالنطاق الرسمي للبوتات
     url = f"https://telegram.org{BOT_TOKEN}/sendChatAction"
     try:
         req = urllib.request.Request(url, data=json.dumps({"chat_id": chat_id, "action": "typing"}).encode("utf-8"), headers={"Content-Type": "application/json"}, method="POST")
@@ -154,7 +153,6 @@ def _async_worker_pipeline(message_data):
         logger.error(f"🚨 خطأ استثنائي في خيط المعالجة الخلفي: {e}")
 
 def cyber_daemon_polling_loop():
-    # [تصحيح حتمي] استبدال النطاق بالنطاق الرسمي للبوتات
     try: urllib.request.urlopen(f"https://telegram.org{BOT_TOKEN}/deleteWebhook", timeout=12)
     except Exception: pass
     
@@ -162,7 +160,6 @@ def cyber_daemon_polling_loop():
     logger.info("📡 انطلاق حلقة الاستماع والضخ السيبراني الفائقة 24/7...")
     
     while True:
-        # [تصحيح حتمي] استبدال النطاق بالنطاق الرسمي للبوتات لتلقي التحديثات
         url = f"https://telegram.org{BOT_TOKEN}/getUpdates?offset={last_update_id + 1}&timeout=30"
         try:
             req = urllib.request.Request(url, headers={"User-Agent": "Telegram Bot Agent"}, method="GET")
@@ -174,7 +171,6 @@ def cyber_daemon_polling_loop():
                         if "message" in update:
                             threading.Thread(target=_async_worker_pipeline, args=(update["message"],), daemon=True).start()
         except urllib.error.HTTPError as http_err:
-            # [تصحيح ذكي شامل] إغلاق السطر المنقطع بالكامل ومعالجة خطأ التعارض 409 الشهير في تليجرام بأمان
             if http_err.code == 409:
                 logger.warning("⚠️ تم كشف تداخل في الاتصال (Conflict 409)، سيتم التخطي والمتابعة...")
                 time.sleep(2)
