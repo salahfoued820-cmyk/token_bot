@@ -111,9 +111,9 @@ def _generate_sovereign_reply(user_text: str) -> str:
         except urllib.error.HTTPError as http_err:
             err_content = http_err.read().decode("utf-8", errors="ignore")
             logger.error(f"❌ [محاولة {attempt+1}] خطأ شبكي حاد من الـ API: {http_err.code}")
-            if "<!DOCTYPE html>" in err_content or http_err.code in:
+            if "<!DOCTYPE html>" in err_content or (500 <= http_err.code < 600):
                 time.sleep(2)
-                continue
+                continue  # يقفز للمحاولة التالية فوراً (ولا يقرأ ما بعده في هذه اللفة)
             return f"⚠️ خطأ في الاستجابة السحابية (كود الخطأ: {http_err.code})"
         except Exception as e:
             logger.error(f"🚨 [محاولة {attempt+1}] فشل الاتصال بالنواة السحابية: {e}")
