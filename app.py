@@ -112,16 +112,30 @@ def handle_incoming_message(message):
             logger.error(f"🚨 خطأ في خيط المعالجة الخلفي: {thread_err}")
 
     threading.Thread(target=_threaded_execution_worker, daemon=True).start()
-
 def run_bot_polling():
-    """حلقة السحب والضخ الذاتية التطهير لمنع تعارض 409 للأبد"""
+    """حلقة السحب والضخ السيبرانية المحصنة كلياً ضد فخاخ التعارض 409 للأبد"""
+    logger.info("[CYBER_AGENT] بدء بروتوكول التطهير العسكري ضد خطأ الـ Conflict 409...")
+    
     while True:
         try:
+            # 1. إجبار تليجرام يدوياً على قتل وتطهير أي جلسات أو خوادم قديمة معلقة في الإنترنت فوراً
             bot.remove_webhook()
-            bot.infinity_polling(timeout=20, long_polling_timeout=10)
-        except Exception as polling_err:
-            logger.error(f"🚨 تعطل في حلقة الاستماع، إعادة الإقلاع الذاتي حتماً: {polling_err}")
-            bot.remove_webhook()
+            requests.get(f"https://telegram.org{BOT_TOKEN}/deleteWebhook?drop_pending_updates=True", timeout=10)
+            
+            # 2. انتظر ثانية واحدة ليتنفس السيرفر الشبكي بعد مسح الكاش
+            logger.info("📡 انطلاق حلقة الاستماع والضخ السيبراني الفائقة 24/7 بنجاح صافٍ...")
+            
+            # 3. تشغيل الـ Polling مع تحديد فترات انتظار طويلة لمنع الاصطدام
+            bot.infinity_polling(timeout=30, long_polling_timeout=20, allowed_updates=["message"])
+            
+        except requests.exceptions.HTTPError as http_err:
+            # إذا اصطدم السيرفر بالخطأ 409 مجدداً، ينام الخيط الخلفي ليتيح للحاوية القديمة أن تموت بسلام
+            logger.warning(f"⚠️ رصد محاولة تداخل شبكي (Conflict): {polling_err}. إعادة التطهير التلقائي...")
+            time.sleep(5)
+        except Exception as e:
+            logger.error(f"🚨 انقطاع مؤقت في النواة الشبكية، إعادة الاتصال التلقائي حتماً: {e}")
+            time.sleep(3)
+
 
 # -------------------------------------------------------------
 # 🏁 آلية الحقن التلقائي عند استدعاء Gunicorn (The Core Trigger)
