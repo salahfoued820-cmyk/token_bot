@@ -68,8 +68,8 @@ def _generate_sovereign_reply(user_text: str) -> str:
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_text[:4096]}
         ],
-        "temperature": 0.85,
-        "max_tokens": 1024
+        "temperature": 0.6,
+        "max_tokens": 2500
     }
     
     try:
