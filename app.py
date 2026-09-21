@@ -14,7 +14,7 @@ API_KEY = os.getenv("OPENROUTER_API_KEY", "").strip()
 RENDER_EXTERNAL_URL = os.getenv("RENDER_EXTERNAL_URL", "").strip()
 
 # [إصلاح #3]: استخدام نموذج قياسي معتمد ومتاح عالمياً في OpenRouter منعا للـ 400
-MODEL_NAME = "nvidia/nemotron-3-super-120b-a12b:free"
+MODEL_NAME = "nvidia/nemotron-3.5-lightning:free"
 
 # [إصلاح #1]: تثبيت رابط نقطة النهاية المكتمل والصحيح للـ API منعا للـ 405
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
@@ -67,7 +67,7 @@ def _generate_sovereign_reply(user_text: str) -> str:
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_text[:4096]}
         ],
-        "temperature": 0.8,
+        "temperature": 0.9,
         "max_tokens": 4000
     }
     
