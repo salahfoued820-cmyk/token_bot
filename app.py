@@ -14,7 +14,7 @@ API_KEY = os.getenv("OPENROUTER_API_KEY", "").strip()
 RENDER_EXTERNAL_URL = os.getenv("RENDER_EXTERNAL_URL", "").strip()
 
 # [إصلاح #3]: استخدام نموذج قياسي معتمد ومتاح عالمياً في OpenRouter منعا للـ 400
-MODEL_NAME = "nex-agi/nex-n2.5-pro:free"
+MODEL_NAME = "wann22"
 # [إصلاح #1]: تثبيت رابط نقطة النهاية المكتمل والصحيح للـ API منعا للـ 405
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
