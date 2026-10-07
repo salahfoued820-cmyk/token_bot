@@ -67,7 +67,7 @@ def _generate_sovereign_reply(user_text: str) -> str:
         ],
         "temperature": 0.6,
         "max_tokens": 4000
-}
+
     
     try:
         response = requests.post(API_URL, headers=headers, json=payload, timeout=45)
