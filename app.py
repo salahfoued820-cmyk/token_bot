@@ -59,7 +59,7 @@ def _generate_sovereign_reply(user_text: str) -> str:
         "Content-Type": "application/json"
     }
     
-    payload = 
+    payload = {
         "model": MODEL_NAME,
         "messages": [
             {"role": "system", "content": system_prompt},
